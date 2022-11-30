@@ -18,13 +18,34 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void Initialize(const TArray<const ABoid*>* Boids);
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-    
+	void ApplySeparationRule(float DeltaTime);
+	void ApplyAlignmentRule(float DeltaTime);
+	void ApplyCohesionRule(float DeltaTime);
+	void MoveWithVelocity(float DeltaTime);
+	void LookForward();
+
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
-
+	UPROPERTY(EditAnywhere)
+	double SeparationStrength;
+	UPROPERTY(EditAnywhere)
+	double AlignmentStrength;
+	UPROPERTY(EditAnywhere)
+	double CohesionStrength;
+	UPROPERTY(EditAnywhere)
+	double FlockingRadius;
+	UPROPERTY(EditAnywhere)
+	double SeparationRadius;
+	UPROPERTY(EditAnywhere)
+	double MaxVelocity;
+	
+	const TArray<const ABoid*>* BoidsArray;
 	bool IsAlive;
+	FVector Velocity;
+
 };

@@ -16,12 +16,26 @@ class BOIDHUNT_API ABoidManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABoidManager();
-	TArray<const ABoid*>* GetBoids();
+	const TArray<const ABoid*>* GetBoids() const;
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void SpawnBoids();
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ABoid> BoidBlueprint;
+
+	UPROPERTY(EditAnywhere)
+	int BoidCount;
 
 	UPROPERTY()
-	TArray<const ABoid*> boids;
+	TArray<const ABoid*> Boids;
+
+	// Dimensions of the box that boids will spawn in
+	UPROPERTY(EditAnywhere)
+	FVector BoxDimensions;
+
+	UPROPERTY()
+	USceneComponent* SceneComponent;
 };

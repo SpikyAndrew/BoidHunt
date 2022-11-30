@@ -18,11 +18,8 @@ ABoid::ABoid()
 void ABoid::BeginPlay()
 {
 	Super::BeginPlay();
-	UWorld* World = GetWorld();
-	if (World)
-	{
-		ABoidHuntGameState* gameState = World->GetGameState<ABoidHuntGameState>();
-	}
+
+	Velocity = FMath::VRand() * 1000;
 }
 
 // Called every frame
@@ -30,5 +27,102 @@ void ABoid::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (BoidsArray)
+	{
+		ApplySeparationRule(DeltaTime);
+		ApplyAlignmentRule(DeltaTime);
+		ApplyCohesionRule(DeltaTime);
+	}
+
+	Velocity = Velocity.GetClampedToSize(0,MaxVelocity);
+	MoveWithVelocity(DeltaTime);
+	LookForward();
+}
+
+// Sets BoidManager if it hasn't been set to anything yet.
+void ABoid::Initialize(const TArray<const ABoid*>* Boids)
+{
+	if (!BoidsArray)
+		BoidsArray = Boids;
+}
+
+void ABoid::ApplySeparationRule(float DeltaTime)
+{
+	for (const ABoid* Other : *BoidsArray)
+	{
+		if (Other != this)
+		{
+			FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
+			const double Distance = LocationDifference.Length();
+			if (Distance < SeparationRadius)
+			{
+				 Velocity -= LocationDifference * DeltaTime * SeparationStrength;
+			}
+		}
+	}
+}
+
+void ABoid::ApplyAlignmentRule(float DeltaTime)
+{
+	FVector AverageVelocity = FVector::Zero();
+	int OthersInCohesion = 0;
+
+	for (const ABoid* Other : *BoidsArray)
+	{
+		if (Other != this)
+		{
+			FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
+			const double Distance = LocationDifference.Length();
+
+			if (Distance < FlockingRadius)
+			{
+				AverageVelocity += Other->Velocity;
+				OthersInCohesion++;
+			}
+		}
+	}
+	
+	if (OthersInCohesion == 0)
+		return;
+	
+	AverageVelocity /= OthersInCohesion;
+	AverageVelocity -= Velocity / 8;
+	Velocity += AverageVelocity * DeltaTime * AlignmentStrength;
+}
+
+void ABoid::ApplyCohesionRule(float DeltaTime)
+{
+	// Find the center of the nearby flock's mass.
+	FVector Center = FVector::Zero();
+	int OthersInCohesion = 0;
+	for (const ABoid* Other : *BoidsArray)
+	{
+		if (Other != this)
+		{
+			FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
+			const double Distance = LocationDifference.Length();
+
+			if (Distance < FlockingRadius)
+			{
+				Center += Other->GetActorLocation();
+				OthersInCohesion++;
+			}
+		}
+	}
+
+	if (OthersInCohesion == 0)
+		return;
+	Center /= OthersInCohesion;
+	Velocity += (Center - GetActorLocation()) * DeltaTime * CohesionStrength;
+}
+
+void ABoid::MoveWithVelocity(float DeltaTime)
+{
+	AddActorWorldOffset(Velocity * DeltaTime);
+}
+
+void ABoid::LookForward()
+{
+	SetActorRotation(Velocity.Rotation().Add(-90,0,0));
 }
 
