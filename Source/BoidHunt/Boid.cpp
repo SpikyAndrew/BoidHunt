@@ -3,6 +3,9 @@
 
 #include "Boid.h"
 
+#include "BoidHuntGameState.h"
+#include "GameFramework/GameStateBase.h"
+
 // Sets default values
 ABoid::ABoid()
 {
@@ -15,7 +18,11 @@ ABoid::ABoid()
 void ABoid::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		ABoidHuntGameState* gameState = World->GetGameState<ABoidHuntGameState>();
+	}
 }
 
 // Called every frame

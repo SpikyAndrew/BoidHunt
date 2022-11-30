@@ -25,4 +25,6 @@ protected:
     
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
+
+	bool IsAlive;
 };
