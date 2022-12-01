@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "Boid.generated.h"
 
@@ -23,16 +24,21 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
+	
 	void ApplySeparationRule(float DeltaTime);
 	void ApplyAlignmentRule(float DeltaTime);
 	void ApplyCohesionRule(float DeltaTime);
 	void StayInBounds(float DeltaTime);
 	void MoveWithVelocity(float DeltaTime);
-	
 	void LookForward();
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Collider;
 	UPROPERTY(EditAnywhere)
 	double SeparationStrength;
 	UPROPERTY(EditAnywhere)

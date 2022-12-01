@@ -6,13 +6,19 @@
 #include "BoidHuntGameState.h"
 #include "GameFramework/GameStateBase.h"
 
-// Sets default values
 ABoid::ABoid()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
+
+	RootComponent = Mesh;
+	Collider->SetupAttachment(Mesh);
+	Collider->SetRelativeLocation(FVector::ZeroVector);
 }
+
+// Sets default values
 
 // Called when the game starts or when spawned
 void ABoid::BeginPlay()
@@ -20,6 +26,7 @@ void ABoid::BeginPlay()
 	Super::BeginPlay();
 
 	Velocity = FMath::VRand() * 1000;
+	Collider->OnComponentBeginOverlap.AddDynamic(this, &ABoid::OnOverlapBegin);
 }
 
 // Called every frame
@@ -150,3 +157,8 @@ void ABoid::LookForward()
 	SetActorRotation(Velocity.Rotation().Add(-90,0,0));
 }
 
+void ABoid::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
+{
+	Destroy();
+}

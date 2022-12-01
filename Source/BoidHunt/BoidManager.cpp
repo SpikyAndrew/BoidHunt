@@ -44,7 +44,6 @@ void ABoidManager::SpawnBoids()
 					+ FVector::RightVector * FMath::RandRange(-Ranges.X,Ranges.X)
 					+ FVector::ForwardVector * FMath::RandRange(-Ranges.Y,Ranges.Y)
 					+ FVector::UpVector * FMath::RandRange(-Ranges.Z,Ranges.Z);
-				UE_LOG(LogTemp, Warning, TEXT("The vector value is: %s"), *SpawnLocation.ToString());
 				ABoid* Boid = World->SpawnActor<ABoid>(BoidBlueprint, SpawnLocation, Rotator, Parameters);
 				Boid->Initialize(&Boids);
 				Boids.Add(Boid);
