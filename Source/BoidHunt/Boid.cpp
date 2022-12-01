@@ -26,7 +26,7 @@ void ABoid::BeginPlay()
 	Super::BeginPlay();
 
 	Velocity = FMath::VRand() * 1000;
-	Collider->OnComponentBeginOverlap.AddDynamic(this, &ABoid::OnOverlapBegin);
+	Collider->OnComponentBeginOverlap.AddUniqueDynamic(this, &ABoid::OnOverlapBegin);
 }
 
 // Called every frame
@@ -42,7 +42,8 @@ void ABoid::Tick(float DeltaTime)
 	}
 
 	StayInBounds(DeltaTime);
-	double MaxVelocity = FMath::Lerp(MaxVelocityDownwards, MaxVelocityUpwards,(1 + Velocity.GetClampedToSize(0,1).Dot(FVector::UpVector))/2);
+	double MaxVelocity = FMath::Lerp(MaxVelocityDownwards, MaxVelocityUpwards,
+		(1 + Velocity.GetClampedToSize(1,1).Dot(FVector::UpVector))/2);
 	Velocity = Velocity.GetClampedToSize(0,MaxVelocity);
 	MoveWithVelocity(DeltaTime);
 	LookForward();
@@ -160,5 +161,12 @@ void ABoid::LookForward()
 void ABoid::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
 {
-	Destroy();
+	FVector Normal = Velocity;
+	Normal.Normalize();
+	double VelocityMagnitude = Velocity.Length();
+	FVector NormalizedVelocity = Velocity.GetClampedToSize(1,1);
+
+
+	Velocity = NormalizedVelocity - 2 * Normal * Normal.Dot(NormalizedVelocity);
+	Velocity *= VelocityMagnitude;
 }
