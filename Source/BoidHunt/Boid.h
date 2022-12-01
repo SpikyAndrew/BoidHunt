@@ -26,7 +26,9 @@ protected:
 	void ApplySeparationRule(float DeltaTime);
 	void ApplyAlignmentRule(float DeltaTime);
 	void ApplyCohesionRule(float DeltaTime);
+	void StayInBounds(float DeltaTime);
 	void MoveWithVelocity(float DeltaTime);
+	
 	void LookForward();
 
 	UPROPERTY(EditAnywhere)
@@ -38,12 +40,20 @@ protected:
 	UPROPERTY(EditAnywhere)
 	double CohesionStrength;
 	UPROPERTY(EditAnywhere)
+	double BoundsStrength;
+	UPROPERTY(EditAnywhere)
 	double FlockingRadius;
 	UPROPERTY(EditAnywhere)
 	double SeparationRadius;
 	UPROPERTY(EditAnywhere)
-	double MaxVelocity;
-	
+	double MaxVelocityDownwards;
+	UPROPERTY(EditAnywhere)
+	double MaxVelocityUpwards;
+	UPROPERTY(EditAnywhere)
+	FVector MinBounds;
+	UPROPERTY(EditAnywhere)
+	FVector MaxBounds;
+
 	const TArray<const ABoid*>* BoidsArray;
 	bool IsAlive;
 	FVector Velocity;

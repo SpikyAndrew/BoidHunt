@@ -34,12 +34,14 @@ void ABoid::Tick(float DeltaTime)
 		ApplyCohesionRule(DeltaTime);
 	}
 
+	StayInBounds(DeltaTime);
+	double MaxVelocity = FMath::Lerp(MaxVelocityDownwards, MaxVelocityUpwards,(1 + Velocity.GetClampedToSize(0,1).Dot(FVector::UpVector))/2);
 	Velocity = Velocity.GetClampedToSize(0,MaxVelocity);
 	MoveWithVelocity(DeltaTime);
 	LookForward();
 }
 
-// Sets BoidManager if it hasn't been set to anything yet.
+// Sets BoidsArray if it hasn't been set to anything yet.
 void ABoid::Initialize(const TArray<const ABoid*>* Boids)
 {
 	if (!BoidsArray)
@@ -114,6 +116,28 @@ void ABoid::ApplyCohesionRule(float DeltaTime)
 		return;
 	Center /= OthersInCohesion;
 	Velocity += (Center - GetActorLocation()) * DeltaTime * CohesionStrength;
+}
+
+void ABoid::StayInBounds(float DeltaTime)
+{
+	const FVector Location = GetActorLocation();
+
+	if (Location.X < MinBounds.X)
+		Velocity += FVector::ForwardVector * BoundsStrength * DeltaTime;
+	else if (Location.X > MaxBounds.X)
+		Velocity -= FVector::ForwardVector * BoundsStrength * DeltaTime;
+
+
+	if (Location.Y < MinBounds.Y)
+		Velocity += FVector::RightVector * BoundsStrength * DeltaTime;
+	else if (Location.Y > MaxBounds.Y)
+		Velocity -= FVector::RightVector * BoundsStrength * DeltaTime;
+
+	
+	if (Location.Z < MinBounds.Z)
+		Velocity += FVector::UpVector * BoundsStrength * DeltaTime;
+	else if (Location.Z > MaxBounds.Z)
+		Velocity -= FVector::UpVector * BoundsStrength * DeltaTime;
 }
 
 void ABoid::MoveWithVelocity(float DeltaTime)
