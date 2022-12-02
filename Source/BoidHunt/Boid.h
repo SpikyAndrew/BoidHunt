@@ -15,6 +15,8 @@ class BOIDHUNT_API ABoid : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABoid();
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* PrimitiveComponent, AActor* Actor, UPrimitiveComponent* PrimitiveComponent1, FVector Vector, const FHitResult& HitResult);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -22,16 +24,14 @@ public:
 	void Initialize(const TArray<const ABoid*>* Boids);
 	
 protected:
-	// Called when the game starts or when spawned
+		// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 	
 	void ApplySeparationRule(float DeltaTime);
 	void ApplyAlignmentRule(float DeltaTime);
 	void ApplyCohesionRule(float DeltaTime);
-	void StayInBounds(float DeltaTime);
+	bool StayInBounds(float DeltaTime);
+	bool AvoidObstacles(float DeltaTime);
 	void MoveWithVelocity(float DeltaTime);
 	void LookForward();
 
@@ -48,9 +48,15 @@ protected:
 	UPROPERTY(EditAnywhere)
 	double BoundsStrength;
 	UPROPERTY(EditAnywhere)
+	double BuildingAvoidanceStrength;
+	UPROPERTY(EditAnywhere)
 	double FlockingRadius;
 	UPROPERTY(EditAnywhere)
+	double BuildingAvoidanceEagerness;
+	UPROPERTY(EditAnywhere)
 	double SeparationRadius;
+	UPROPERTY(EditAnywhere)
+	double MinVelocity;
 	UPROPERTY(EditAnywhere)
 	double MaxVelocityDownwards;
 	UPROPERTY(EditAnywhere)
