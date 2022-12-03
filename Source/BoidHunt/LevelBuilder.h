@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GridSpawner.generated.h"
+#include "LevelBuilder.generated.h"
 
 UCLASS()
-class BOIDHUNT_API AGridSpawner : public AActor
+class BOIDHUNT_API ALevelBuilder : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AGridSpawner();
+	ALevelBuilder();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -34,4 +34,6 @@ protected:
 	int Length;
 	UPROPERTY(EditAnywhere)
 	double CellSize;
+	UPROPERTY(EditAnywhere)
+	TArray<double> BuildingHeights;
 };

@@ -4,11 +4,7 @@
 #include "BoidManager.h"
 
 #include "Falcon.h"
-#include "Chaos/AABB.h"
-#include "Chaos/AABB.h"
-#include "Chaos/AABB.h"
-#include "Chaos/AABB.h"
-#include "Debug/ReporterGraph.h"
+#include "Boid.h"
 
 // Sets default values
 ABoidManager::ABoidManager()
@@ -17,6 +13,28 @@ ABoidManager::ABoidManager()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+}
+
+const TArray<const ABoid*>* ABoidManager::GetBoids() const
+{
+	return &Boids;
+}
+
+const TArray<AFalcon*>* ABoidManager::GetFalcons() const
+{
+	return &Falcons;
+}
+
+void ABoidManager::SpawnBoid(FVector Location)
+{
+	if (UWorld* World = GetWorld())
+	{
+		FActorSpawnParameters Parameters;
+		ABoid* Boid = World->SpawnActor<ABoid>(BoidBlueprint, Location, FRotator::ZeroRotator, Parameters);
+		Boid->Initialize(this);
+		Boid->Initialize(this);
+		Boids.Add(Boid);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -33,26 +51,21 @@ void ABoidManager::SpawnBoids()
 		if (UWorld* World = GetWorld())
 		{
 			const FVector Center = this->GetTransform().GetLocation();
-			FActorSpawnParameters Parameters;
-			Parameters.Owner = this;
-			const FRotator Rotator;
-			FVector SpawnLocation;
 			FVector Ranges = BoxDimensions / 2;
 			
 			for(int i = 0; i<BoidCount; i++)
 			{
-				SpawnLocation = Center
+				FVector SpawnLocation = Center
 					+ FVector::RightVector * FMath::RandRange(-Ranges.X,Ranges.X)
 					+ FVector::ForwardVector * FMath::RandRange(-Ranges.Y,Ranges.Y)
 					+ FVector::UpVector * FMath::RandRange(-Ranges.Z,Ranges.Z);
-				ABoid* Boid = World->SpawnActor<ABoid>(BoidBlueprint, SpawnLocation, Rotator, Parameters);
-				Boid->Initialize(&Boids);
-				Boids.Add(Boid);
+				SpawnBoid(SpawnLocation);
 			}
 		}
+		
 		for (AFalcon* Falcon : Falcons)
 		{
-			Falcon->Initialize(&Boids);
+			Falcon->Initialize(this);
 		}
 	}
 }

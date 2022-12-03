@@ -5,6 +5,7 @@
 
 #include "BoidHuntGameState.h"
 #include "GameFramework/GameStateBase.h"
+#include "Falcon.h"
 
 ABoid::ABoid()
 {
@@ -21,26 +22,46 @@ void ABoid::BeginPlay()
 	Collider->OnComponentHit.AddUniqueDynamic(this, &AFlyerBase::BounceOnHit);
 }
 
-void ABoid::Deactivate()
+bool ABoid::AvoidFalcons(double DeltaTime)
 {
-	IsAlive = false;
-	SetActorTickEnabled(false);
-	Mesh->SetVisibility(false);
-	Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	bool IsAvoidingFalcons = false;
+	
+	for (AFalcon* Falcon : *BoidManager->GetFalcons())
+	{
+		if (!Falcon->GetIsAlive())
+			continue;
+		
+		FVector LocationDiff = Falcon->GetActorLocation() - GetActorLocation();
+		
+		if (LocationDiff.Length() < FalconAvoidanceRadius)
+		{
+			LocationDiff.Normalize();
+			Velocity -= LocationDiff * DeltaTime * FalconAvoidanceStrength;
+			IsAvoidingFalcons = true;
+			DrawDebugLine(GetWorld(), GetActorLocation(), Falcon->GetActorLocation(), FColor::Green, false, -1, 0, 5);
+		}
+	}
+	
+	return IsAvoidingFalcons;
 }
 
 void ABoid::SteerTowardsGoals(float DeltaTime)
 {
 	Super::SteerTowardsGoals(DeltaTime);
 
-	ApplySeparationRule(DeltaTime);
-	ApplyAlignmentRule(DeltaTime);
-	ApplyCohesionRule(DeltaTime);
+	bool IsAvoidingFalcons = AvoidFalcons(DeltaTime);
+
+	if (!IsAvoidingFalcons)
+	{
+		ApplySeparationRule(DeltaTime);
+		ApplyAlignmentRule(DeltaTime);
+		ApplyCohesionRule(DeltaTime);
+	}
 }
 
 void ABoid::ApplySeparationRule(float DeltaTime)
 {
-	for (const ABoid* Other : *BoidsArray)
+	for (const ABoid* Other : *BoidManager->GetBoids())
 	{
 		if (Other != this && Other->GetIsAlive())
 		{
@@ -59,7 +80,7 @@ void ABoid::ApplyAlignmentRule(float DeltaTime)
 	FVector AverageVelocity = FVector::Zero();
 	int OthersInCohesion = 0;
 
-	for (const ABoid* Other : *BoidsArray)
+	for (const ABoid* Other : *BoidManager->GetBoids())
 	{
 		if (Other != this)
 		{
@@ -87,7 +108,7 @@ void ABoid::ApplyCohesionRule(float DeltaTime)
 	// Find the center of the nearby flock's mass.
 	FVector Center = FVector::Zero();
 	int OthersInCohesion = 0;
-	for (const ABoid* Other : *BoidsArray)
+	for (const ABoid* Other : *BoidManager->GetBoids())
 	{
 		if (Other != this)
 		{

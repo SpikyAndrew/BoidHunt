@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GridSpawner.h"
+#include "LevelBuilder.h"
 
 #include "GameFramework/GameStateBase.h"
 
 // Sets default values
-AGridSpawner::AGridSpawner()
+ALevelBuilder::ALevelBuilder()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -14,13 +14,13 @@ AGridSpawner::AGridSpawner()
 }
 
 // Called when the game starts or when spawned
-void AGridSpawner::BeginPlay()
+void ALevelBuilder::BeginPlay()
 {
 	Super::BeginPlay();
 	Spawn();
 }
 
-void AGridSpawner::Spawn()
+void ALevelBuilder::Spawn()
 {
 	if (ActorToSpawn)
 	{
@@ -46,7 +46,7 @@ void AGridSpawner::Spawn()
 }
 
 // Called every frame
-void AGridSpawner::Tick(float DeltaTime)
+void ALevelBuilder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

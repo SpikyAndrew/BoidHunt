@@ -17,10 +17,10 @@ public:
 	// Sets default values for this actor's properties
 	ABoid();
 	void BeginPlay();
-	void Deactivate();
 
 protected:
 	virtual void SteerTowardsGoals(float DeltaTime) override;
+	bool AvoidFalcons(double DeltaTime);
 	void ApplySeparationRule(float DeltaTime);
 	void ApplyAlignmentRule(float DeltaTime);
 	void ApplyCohesionRule(float DeltaTime);
@@ -35,4 +35,8 @@ protected:
 	double FlockingRadius;
 	UPROPERTY(EditAnywhere)
 	double SeparationRadius;
+	UPROPERTY(EditAnywhere)
+	double FalconAvoidanceRadius;
+	UPROPERTY(EditAnywhere)
+	double FalconAvoidanceStrength;
 };

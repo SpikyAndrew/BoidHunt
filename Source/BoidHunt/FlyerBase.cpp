@@ -3,6 +3,8 @@
 
 #include "FlyerBase.h"
 
+#include "BoidManager.h"
+
 // Sets default values
 AFlyerBase::AFlyerBase()
 {
@@ -32,7 +34,7 @@ void AFlyerBase::Tick(float DeltaTime)
 	IsAvoiding =  AvoidObstacles(DeltaTime);
 	IsOutOfBounds = StayInBounds(DeltaTime);
 
-	if (BoidsArray && !IsAvoiding && !IsOutOfBounds)
+	if (BoidManager && !IsAvoiding && !IsOutOfBounds)
 		SteerTowardsGoals(DeltaTime);
 	
 	double MaxVelocity = FMath::Lerp(MaxVelocityDownwards, MaxVelocityUpwards,
@@ -43,10 +45,10 @@ void AFlyerBase::Tick(float DeltaTime)
 }
 
 // Sets BoidsArray if it hasn't been set to anything yet.
-void AFlyerBase::Initialize(const TArray<const ABoid*>* Boids)
+void AFlyerBase::Initialize(ABoidManager* Manager)
 {
-	if (!BoidsArray)
-		BoidsArray = Boids;
+	if (!BoidManager)
+		BoidManager = Manager;
 }
 
 bool AFlyerBase::GetIsAlive() const
@@ -97,6 +99,15 @@ bool AFlyerBase::StayInBounds(float DeltaTime)
 
 	return IsOutOfBounds;
 }
+
+void AFlyerBase::Deactivate()
+{
+	IsAlive = false;
+	SetActorTickEnabled(false);
+	Mesh->SetVisibility(false);
+	Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 
 void AFlyerBase::MoveWithVelocity(float DeltaTime)
 {

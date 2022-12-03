@@ -26,6 +26,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	double StartingEnergy;
 	UPROPERTY(EditAnywhere)
+	double EnergyGainPerKill;
+	UPROPERTY(EditAnywhere)
 	double SteeringStrength;
 	
 	FVector PreviousVelocity;

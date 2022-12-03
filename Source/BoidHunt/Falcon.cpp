@@ -19,23 +19,33 @@ void AFalcon::OnHitCheckForBoid(UPrimitiveComponent* PrimitiveComponent, AActor*
 {
 	ABoid* BoidHit = Cast<ABoid>(OtherActor);
 	if(BoidHit)
+	{
 		BoidHit->Deactivate();
+		Energy += EnergyGainPerKill;
+	}
 	else
-		BounceOnHit(PrimitiveComponent, OtherActor, OtherComponent, Vector, HitResult);		
+	{
+		BounceOnHit(PrimitiveComponent, OtherActor, OtherComponent, Vector, HitResult);
+	}
 }
 
 void AFalcon::BeginPlay()
 {
 	Super::BeginPlay();
 	Collider->OnComponentHit.AddUniqueDynamic(this, &AFalcon::OnHitCheckForBoid);
+	Energy = StartingEnergy;
 }
-
 
 void AFalcon::Tick(float DeltaSeconds)
 {
 	PreviousVelocity = Velocity;
 	Super::Tick(DeltaSeconds);
 	Energy -= (Velocity - PreviousVelocity).Length();
+	if (Energy < 0)
+	{
+		BoidManager->SpawnBoid(GetActorLocation());
+		Deactivate();
+	}
 }
 
 void AFalcon::SteerTowardsGoals(float DeltaTime)
@@ -54,7 +64,7 @@ FVector AFalcon::GetRelativePositionOfPrey() const
 	// In case we never find a target, fly forward.
 	FVector RelativePositionOfPrey = GetActorForwardVector();
 	
-	for (const ABoid* Boid : *BoidsArray)
+	for (const ABoid* Boid : *BoidManager->GetBoids())
 	{
 		if (!Boid->GetIsAlive())
 			continue;
@@ -67,6 +77,5 @@ FVector AFalcon::GetRelativePositionOfPrey() const
 			RelativePositionOfPrey = RelativePosition;
 		}
 	}
-	DrawDebugLine(GetWorld(), Location, Location + RelativePositionOfPrey, FColor::Green, false, -1, 0, 5);
 	return RelativePositionOfPrey;
 }

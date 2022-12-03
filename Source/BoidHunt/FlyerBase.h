@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BoidManager.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "FlyerBase.generated.h"
@@ -22,23 +23,23 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void Initialize(const TArray<const ABoid*>* Boids);
+	virtual void Deactivate();
+	void Initialize(ABoidManager* BoidManager);
 	bool GetIsAlive() const;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual	void SteerTowardsGoals(float DeltaTime);
 	bool StayInBounds(float DeltaTime);
 	bool AvoidObstacles(float DeltaTime);
 	void MoveWithVelocity(float DeltaTime);
 	void LookForward();
-	virtual	void SteerTowardsGoals(float DeltaTime);
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* Collider;
-
 	
 	UPROPERTY(EditAnywhere)
 	double MinVelocity;
@@ -57,7 +58,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	double BuildingAvoidanceEagerness;
 	
-	const TArray<const ABoid*>* BoidsArray;
+	ABoidManager* BoidManager;
 	bool IsAlive;
 	FVector Velocity;
 	bool IsAvoiding;
