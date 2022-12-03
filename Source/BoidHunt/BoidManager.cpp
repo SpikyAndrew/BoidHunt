@@ -3,6 +3,7 @@
 
 #include "BoidManager.h"
 
+#include "Falcon.h"
 #include "Chaos/AABB.h"
 #include "Chaos/AABB.h"
 #include "Chaos/AABB.h"
@@ -48,6 +49,10 @@ void ABoidManager::SpawnBoids()
 				Boid->Initialize(&Boids);
 				Boids.Add(Boid);
 			}
+		}
+		for (AFalcon* Falcon : Falcons)
+		{
+			Falcon->Initialize(&Boids);
 		}
 	}
 }

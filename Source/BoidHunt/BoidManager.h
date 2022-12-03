@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "BoidManager.generated.h"
 
+class AFalcon;
 UCLASS()
 class BOIDHUNT_API ABoidManager : public AActor
 {
@@ -25,17 +26,15 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABoid> BoidBlueprint;
-
 	UPROPERTY(EditAnywhere)
 	int BoidCount;
-
 	UPROPERTY()
 	TArray<const ABoid*> Boids;
-
 	// Dimensions of the box that boids will spawn in
 	UPROPERTY(EditAnywhere)
 	FVector BoxDimensions;
-
+	UPROPERTY(EditAnywhere)
+	TArray<AFalcon*> Falcons;
 	UPROPERTY()
 	USceneComponent* SceneComponent;
 };
