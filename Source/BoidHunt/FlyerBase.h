@@ -48,10 +48,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	double MaxVelocityUpwards;
 	UPROPERTY(EditAnywhere)
-	FVector MinBounds;
-	UPROPERTY(EditAnywhere)
-	FVector MaxBounds;
-	UPROPERTY(EditAnywhere)
 	double BoundsStrength;
 	UPROPERTY(EditAnywhere)
 	double BuildingAvoidanceStrength;

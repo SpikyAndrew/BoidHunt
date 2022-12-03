@@ -13,10 +13,20 @@ ALevelBuilder::ALevelBuilder()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 }
 
+FBounds3d ALevelBuilder::CalculateLevelBounds() const
+{
+	FBounds3d CalculatedBounds;
+	CalculatedBounds.Min = FVector(-Width/2 * CellSize, -Length/2 * CellSize,500);
+	CalculatedBounds.Max = FVector(Width/2 * CellSize,Length/2 * CellSize,6000);
+	return CalculatedBounds;
+}
+
 // Called when the game starts or when spawned
 void ALevelBuilder::BeginPlay()
 {
 	Super::BeginPlay();
+	SetActorLocation(FVector(CellSize/2, CellSize/2, 0));
+	Bounds = CalculateLevelBounds();
 	Spawn();
 }
 
@@ -29,16 +39,17 @@ void ALevelBuilder::Spawn()
 			const FVector Center = this->GetTransform().GetLocation();
 			FActorSpawnParameters Parameters;
 			Parameters.Owner = this;
-			const FRotator Rotator;
 			FVector SpawnLocation;
-			for(int x = -Width/2; x<Width/2; x++)
+			for(int x = 0; x<Width; x++)
 			{
-				for (int y = -Length/2; y<Length/2; y++)
+				for (int y = 0; y<Length; y++)
 				{
 					SpawnLocation = Center
-						+ FVector::RightVector * x * CellSize
-						+ FVector::ForwardVector * y * CellSize;
-					World->SpawnActor<AActor>(ActorToSpawn, SpawnLocation, Rotator, Parameters);
+						+ FVector::RightVector * (x - Width/2) * CellSize
+						+ FVector::ForwardVector * (y - Length/2) * CellSize;
+					AActor* Actor = World->SpawnActor<AActor>(ActorToSpawn, SpawnLocation, FRotator::ZeroRotator, Parameters);
+
+					Actor->SetActorScale3D(FVector(BuildingWidth,BuildingWidth, BuildingHeights[x + y * Width]));
 				}
 			}
 		}
@@ -50,5 +61,10 @@ void ALevelBuilder::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+FBounds3d ALevelBuilder::GetBounds() const
+{
+	return Bounds;
 }
 

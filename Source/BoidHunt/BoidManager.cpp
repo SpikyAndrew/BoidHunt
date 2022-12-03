@@ -15,6 +15,17 @@ ABoidManager::ABoidManager()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 }
 
+FBounds3d ABoidManager::GetBounds() const
+{
+	if (LevelBuilder)
+		return LevelBuilder->GetBounds();
+
+	FBounds3d Bounds = FBounds3d();
+	Bounds.Max = FVector(MAX_dbl, MAX_dbl, MAX_dbl);
+	Bounds.Min = FVector(MIN_dbl, MIN_dbl, MIN_dbl);
+	return Bounds;
+}
+
 const TArray<const ABoid*>* ABoidManager::GetBoids() const
 {
 	return &Boids;

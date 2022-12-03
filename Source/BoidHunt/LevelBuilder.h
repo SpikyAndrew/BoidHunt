@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Math/Bounds.h"
 #include "LevelBuilder.generated.h"
 
 UCLASS()
@@ -14,9 +15,11 @@ class BOIDHUNT_API ALevelBuilder : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ALevelBuilder();
-
+	FBounds3d CalculateLevelBounds() const;
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	FBounds3d GetBounds() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,5 +38,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	double CellSize;
 	UPROPERTY(EditAnywhere)
+	double BuildingWidth;
+	UPROPERTY(EditAnywhere)
 	TArray<double> BuildingHeights;
+
+	FBounds3d Bounds;
 };

@@ -60,38 +60,39 @@ bool AFlyerBase::StayInBounds(float DeltaTime)
 {
 	const FVector Location = GetActorLocation();
 
+	const FBounds3d Bounds = BoidManager->GetBounds();
 	IsOutOfBounds = false;
 	
-	if (Location.X < MinBounds.X)
+	if (Location.X < Bounds.Min.X)
 	{
 		IsOutOfBounds = true;
 		Velocity += FVector::ForwardVector * BoundsStrength * DeltaTime;
 	}
-	else if (Location.X > MaxBounds.X)
+	else if (Location.X > Bounds.Max.X)
 	{
 		IsOutOfBounds = true;
 	Velocity -= FVector::ForwardVector * BoundsStrength * DeltaTime;
 	}
 
 
-	if (Location.Y < MinBounds.Y)
+	if (Location.Y < Bounds.Min.Y)
 	{
 		IsOutOfBounds = true;
 		Velocity += FVector::RightVector * BoundsStrength * DeltaTime;
 	}
-	else if (Location.Y > MaxBounds.Y)
+	else if (Location.Y > Bounds.Max.Y)
 	{
 		IsOutOfBounds = true;
 		Velocity -= FVector::RightVector * BoundsStrength * DeltaTime;
 	}
 
 	
-	if (Location.Z < MinBounds.Z)
+	if (Location.Z < Bounds.Min.Z)
 	{
 		IsOutOfBounds = true;
 		Velocity += FVector::UpVector * BoundsStrength * DeltaTime;
 	}
-	else if (Location.Z > MaxBounds.Z)
+	else if (Location.Z > Bounds.Max.Z)
 	{
 		IsOutOfBounds = true;
 		Velocity -= FVector::UpVector * BoundsStrength * DeltaTime;

@@ -17,6 +17,7 @@ class BOIDHUNT_API ABoidManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABoidManager();
+	FBounds3d GetBounds() const;
 	const TArray<const ABoid*>* GetBoids() const;
 	const TArray<AFalcon*>* ABoidManager::GetFalcons() const;
 	void SpawnBoid(FVector Location);
@@ -26,7 +27,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void SpawnBoids();
-	
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABoid> BoidBlueprint;
 	UPROPERTY(EditAnywhere)
@@ -34,11 +35,12 @@ protected:
 	UPROPERTY()
 	TArray<const ABoid*> Boids;
 	UPROPERTY(EditAnywhere)
+	ALevelBuilder* LevelBuilder;
+	UPROPERTY(EditAnywhere)
 	TArray<AFalcon*> Falcons;
 	// Dimensions of the box that boids will spawn in
 	UPROPERTY(EditAnywhere)
 	FVector BoxDimensions;
-	
 	UPROPERTY()
 	USceneComponent* SceneComponent;
 };
