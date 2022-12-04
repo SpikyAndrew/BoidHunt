@@ -53,7 +53,7 @@ protected:
 	double BuildingAvoidanceStrength;
 	UPROPERTY(EditAnywhere)
 	double BuildingAvoidanceEagerness;
-	
+	UPROPERTY()
 	ABoidManager* BoidManager;
 	bool IsAlive;
 	FVector Velocity;

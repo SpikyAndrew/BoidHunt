@@ -14,4 +14,8 @@ UCLASS()
 class BOIDHUNT_API ABoidHuntGameState : public AGameStateBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	ABoidManager* BoidManager;
 };

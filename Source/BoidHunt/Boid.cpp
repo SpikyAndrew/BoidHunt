@@ -4,6 +4,7 @@
 #include "Boid.h"
 
 #include "BoidHuntGameState.h"
+#include "BoidManagerSubsystem.h"
 #include "GameFramework/GameStateBase.h"
 #include "Falcon.h"
 

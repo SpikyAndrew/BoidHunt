@@ -13,5 +13,4 @@ UCLASS()
 class BOIDHUNT_API ABoidHuntGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
 };

@@ -3,9 +3,12 @@
 
 #include "BoidHuntCharacter.h"
 
+#include "BoidHuntGameState.h"
+#include "BoidManagerSubsystem.h"
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "ToolBuilderUtil.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -13,17 +16,12 @@ ABoidHuntCharacter::ABoidHuntCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-    Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-    Camera->FieldOfView = 90.f;
-	Camera->SetupAttachment(RootComponent);
-	Camera->SetRelativeLocation(FVector( 0,0,189.f));
 }
 
 // Called when the game starts or when spawned
 void ABoidHuntCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -47,8 +45,20 @@ void ABoidHuntCharacter::OnMoveAction(const FInputActionValue& InputActionValue)
 	AddMovementInput(Direction3D);
 }
 
+FVector ABoidHuntCharacter::GetFiringLocation() const
+{
+	return GetActorLocation() + BaseEyeHeight * FVector::UpVector + 50 * GetBaseAimRotation().Vector();
+}
+
 void ABoidHuntCharacter::OnFireAction()
 {
+	if (BoidManager == nullptr)
+	{
+		ABoidHuntGameState* GameState = static_cast<ABoidHuntGameState*>(GetWorld()->GetGameState());
+		if (GameState)
+			BoidManager = GameState->BoidManager;
+	}
+	BoidManager->SpawnFalcon(GetFiringLocation(), GetBaseAimRotation().Vector());
 }
 
 void ABoidHuntCharacter::OnGlideAction()
@@ -70,29 +80,20 @@ void ABoidHuntCharacter::OnLookAction(const FInputActionValue& InputActionValue)
 void ABoidHuntCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	UE_LOG(LogTemp, Warning, TEXT("Trying to bind"));
 
 	if (UEnhancedInputComponent* PlayerEnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
     {
-        // There are ways to bind a UInputAction* to a handler function and multiple types of ETriggerEvent that may be of interest.
-		UE_LOG(LogTemp, Warning, TEXT("Cast successful"));
-
         if (JumpAction)
             PlayerEnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABoidHuntCharacter::OnJumpAction);
 		if (MoveAction)
 			PlayerEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnMoveAction);
 		if (FireAction)
-			PlayerEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnFireAction);
+			PlayerEnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnFireAction);
 		if (GlideAction)
 			PlayerEnhancedInputComponent->BindAction(GlideAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnGlideAction);
 		if (GlideAction)
 			PlayerEnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnLookAction);
 
-		// // This calls the handler function (a UFUNCTION) by name on every tick while the input conditions are met, such as when holding a movement key down.
-        // if (MyOtherInputAction)
-        // {
-        //     PlayerEnhancedInputComponent->BindAction(MyOtherInputAction, ETriggerEvent::Triggered, this, TEXT("MyOtherInputHandlerFunction"));
-        // }
     }
 }
 

@@ -5,6 +5,7 @@
 
 #include "Falcon.h"
 #include "Boid.h"
+#include "BoidHuntGameState.h"
 
 // Sets default values
 ABoidManager::ABoidManager()
@@ -17,7 +18,7 @@ ABoidManager::ABoidManager()
 
 FBounds3d ABoidManager::GetBounds() const
 {
-	if (LevelBuilder)
+	if (LevelBuilder!=nullptr)
 		return LevelBuilder->GetBounds();
 
 	FBounds3d Bounds = FBounds3d();
@@ -43,8 +44,18 @@ void ABoidManager::SpawnBoid(FVector Location)
 		FActorSpawnParameters Parameters;
 		ABoid* Boid = World->SpawnActor<ABoid>(BoidBlueprint, Location, FRotator::ZeroRotator, Parameters);
 		Boid->Initialize(this);
-		Boid->Initialize(this);
 		Boids.Add(Boid);
+	}
+}
+
+void ABoidManager::SpawnFalcon(FVector Location, FVector Direction)
+{
+	if (UWorld* World = GetWorld())
+	{
+		FActorSpawnParameters Parameters;
+		AFalcon* Falcon = World->SpawnActor<AFalcon>(FalconBlueprint, Location, FRotator::ZeroRotator, Parameters);
+		Falcon->Initialize(this, Direction);
+		Falcons.Add(Falcon);
 	}
 }
 
@@ -52,6 +63,13 @@ void ABoidManager::SpawnBoid(FVector Location)
 void ABoidManager::BeginPlay()
 {
 	Super::BeginPlay();
+	ABoidHuntGameState* GameState = GetWorld()->GetGameState<ABoidHuntGameState>();
+
+	if (GameState)
+	{
+		GameState->BoidManager = this;
+	}
+	
 	SpawnBoids();
 }
 
@@ -72,11 +90,6 @@ void ABoidManager::SpawnBoids()
 					+ FVector::UpVector * FMath::RandRange(-Ranges.Z,Ranges.Z);
 				SpawnBoid(SpawnLocation);
 			}
-		}
-		
-		for (AFalcon* Falcon : Falcons)
-		{
-			Falcon->Initialize(this);
 		}
 	}
 }

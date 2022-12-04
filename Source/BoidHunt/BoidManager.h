@@ -21,6 +21,7 @@ public:
 	const TArray<const ABoid*>* GetBoids() const;
 	const TArray<AFalcon*>* ABoidManager::GetFalcons() const;
 	void SpawnBoid(FVector Location);
+	void SpawnFalcon(FVector Location, FVector Direction);
 
 
 protected:
@@ -31,13 +32,15 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABoid> BoidBlueprint;
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<AFalcon> FalconBlueprint;
+	UPROPERTY(EditAnywhere)
 	int BoidCount;
 	UPROPERTY()
 	TArray<const ABoid*> Boids;
-	UPROPERTY(EditAnywhere)
-	ALevelBuilder* LevelBuilder;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	TArray<AFalcon*> Falcons;
+	UPROPERTY(EditInstanceOnly)
+	ALevelBuilder* LevelBuilder;
 	// Dimensions of the box that boids will spawn in
 	UPROPERTY(EditAnywhere)
 	FVector BoxDimensions;

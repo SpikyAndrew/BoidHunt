@@ -4,6 +4,7 @@
 #include "FlyerBase.h"
 
 #include "BoidManager.h"
+#include "Math/Bounds.h"
 
 // Sets default values
 AFlyerBase::AFlyerBase()
@@ -32,11 +33,14 @@ void AFlyerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	IsAvoiding =  AvoidObstacles(DeltaTime);
-	IsOutOfBounds = StayInBounds(DeltaTime);
 
-	if (BoidManager && !IsAvoiding && !IsOutOfBounds)
-		SteerTowardsGoals(DeltaTime);
-	
+	if (BoidManager)
+	{
+		IsOutOfBounds = StayInBounds(DeltaTime);
+		if (!IsAvoiding && !IsOutOfBounds)
+			SteerTowardsGoals(DeltaTime);
+	}
+
 	double MaxVelocity = FMath::Lerp(MaxVelocityDownwards, MaxVelocityUpwards,
 		(1 + Velocity.GetClampedToSize(1,1).Dot(FVector::UpVector))/2);
 	Velocity = Velocity.GetClampedToSize(MinVelocity,MaxVelocity);

@@ -7,7 +7,7 @@
 #include "Math/Bounds.h"
 #include "LevelBuilder.generated.h"
 
-UCLASS()
+UCLASS(Config=Game)
 class BOIDHUNT_API ALevelBuilder : public AActor
 {
 	GENERATED_BODY()
@@ -22,6 +22,8 @@ public:
 	FBounds3d GetBounds() const;
 
 protected:
+	void ValidateAndFixConfig();
+	static void PrintValidationWarning(FString Text);
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void Spawn();
@@ -31,16 +33,20 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	USceneComponent* SceneComponent;
-	UPROPERTY(EditAnywhere)
-	int Width;
-	UPROPERTY(EditAnywhere)
-	int Length;
+
 	UPROPERTY(EditAnywhere)
 	double CellSize;
 	UPROPERTY(EditAnywhere)
 	double BuildingWidth;
-	UPROPERTY(EditAnywhere)
+	
+	UPROPERTY(Config)
+	int Width;
+	UPROPERTY(Config)
+	int Length;
+	UPROPERTY(Config)
 	TArray<double> BuildingHeights;
 
 	FBounds3d Bounds;
+	
+	const int MinLevelSize = 1;
 };

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BoidManager.h"
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
@@ -20,6 +21,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void OnJumpAction();
 	void OnMoveAction(const FInputActionValue& InputActionValue);
+	FVector GetFiringLocation() const;
 	void OnFireAction();
 	void OnGlideAction();
 	void OnLookAction(const FInputActionValue& InputActionValue);
@@ -31,8 +33,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
-	UCameraComponent* Camera;
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* MoveAction;
@@ -46,4 +46,6 @@ protected:
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere)
 	UInputMappingContext* InputMappingContext;
+	UPROPERTY()
+	ABoidManager* BoidManager = nullptr;
 };

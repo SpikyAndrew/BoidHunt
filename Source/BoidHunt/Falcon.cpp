@@ -4,6 +4,7 @@
 #include "Falcon.h"
 
 #include "Boid.h"
+#include "BoidManagerSubsystem.h"
 
 #include "Math/NumericLimits.h"
 #include "DrawDebugHelpers.h"
@@ -34,6 +35,15 @@ void AFalcon::BeginPlay()
 	Super::BeginPlay();
 	Collider->OnComponentHit.AddUniqueDynamic(this, &AFalcon::OnHitCheckForBoid);
 	Energy = StartingEnergy;
+}
+
+void AFalcon::Initialize(ABoidManager* Manager, const FVector& Direction)
+{
+	if (BoidManager)
+		return;
+	
+	BoidManager = Manager;
+	Velocity = Direction * MaxVelocityDownwards;
 }
 
 void AFalcon::Tick(float DeltaSeconds)

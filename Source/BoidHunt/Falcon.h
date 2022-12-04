@@ -18,6 +18,7 @@ public:
 	UFUNCTION()
 	void OnHitCheckForBoid(UPrimitiveComponent* PrimitiveComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector Vector, const FHitResult& HitResult);
 	virtual void BeginPlay() override;
+	void Initialize(ABoidManager* Manager, const FVector& Direction);
 protected:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual	void SteerTowardsGoals(float DeltaTime) override;
