@@ -31,6 +31,8 @@ protected:
 	double EnergyGainPerKill;
 	UPROPERTY(EditAnywhere)
 	double SteeringStrength;
+	UPROPERTY(EditAnywhere)
+	double NoSteeringTimer;
 	
 	FVector PreviousVelocity;
 	double Energy;

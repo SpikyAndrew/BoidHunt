@@ -67,8 +67,8 @@ void ABoidHuntCharacter::OnJumpAction()
 {
 	if (!GetMovementComponent()->IsMovingOnGround())
 		TryWallJump();
-	
-	Jump();
+	else
+		Jump();
 }
 
 void ABoidHuntCharacter::OnMoveAction(const FInputActionValue& InputActionValue)
@@ -93,12 +93,11 @@ void ABoidHuntCharacter::OnFireAction()
 			BoidManager = GameState->BoidManager;
 	}
 	BoidManager->SpawnFalcon(GetFiringLocation(), GetBaseAimRotation().Vector());
-	GetCharacterMovement()->AddImpulse(-GetBaseAimRotation().Vector()*10000);
 }
 
 void ABoidHuntCharacter::OnGlideAction()
 {
-	
+	GetCharacterMovement()->AddImpulse(FVector::UpVector*3000);
 }
 
 void ABoidHuntCharacter::OnLookAction(const FInputActionValue& InputActionValue)
@@ -122,7 +121,7 @@ void ABoidHuntCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
         if (JumpAction)
             PlayerEnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABoidHuntCharacter::OnJumpAction);
         if (GlideAction)
-	        PlayerEnhancedInputComponent->BindAction(GlideAction, ETriggerEvent::Started, this, &ABoidHuntCharacter::OnGlideAction);
+	        PlayerEnhancedInputComponent->BindAction(GlideAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnGlideAction);
         if (MoveAction)
 			PlayerEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnMoveAction);
         if (FireAction)

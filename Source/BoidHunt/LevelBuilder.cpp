@@ -14,8 +14,8 @@ ALevelBuilder::ALevelBuilder()
 FBounds3d ALevelBuilder::CalculateLevelBounds() const
 {
 	FBounds3d CalculatedBounds;
-	CalculatedBounds.Min = FVector(-Width/2 * CellSize, -Length/2 * CellSize,1000);
-	CalculatedBounds.Max = FVector(Width/2 * CellSize,Length/2 * CellSize,6000);
+	CalculatedBounds.Min = FVector(-Width/2 * CellSize, -Length/2 * CellSize,5000);
+	CalculatedBounds.Max = FVector(Width/2 * CellSize,Length/2 * CellSize,30000);
 	return CalculatedBounds;
 }
 

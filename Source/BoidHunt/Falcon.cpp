@@ -24,6 +24,8 @@ void AFalcon::OnHitCheckForBoid(UPrimitiveComponent* PrimitiveComponent, AActor*
 	{
 		BoidHit->Deactivate();
 		Energy += EnergyGainPerKill;
+		// QOL: When we've hit a boid, start hunting normally.
+		NoSteeringTimer = 0;
 	}
 	else
 	{
@@ -60,8 +62,19 @@ void AFalcon::Initialize(ABoidManager* Manager, const FVector& Direction)
 
 void AFalcon::Tick(float DeltaSeconds)
 {
+	NoSteeringTimer -= DeltaSeconds;
+	
 	PreviousVelocity = Velocity;
+
+	if (NoSteeringTimer > 0)
+	{
+		MoveWithVelocity(DeltaSeconds);
+		LookForward();
+		return;
+	}
+	
 	Super::Tick(DeltaSeconds);
+	
 	Energy -= (Velocity - PreviousVelocity).Length();
 	if (Energy < 0)
 	{
@@ -73,7 +86,7 @@ void AFalcon::Tick(float DeltaSeconds)
 void AFalcon::SteerTowardsGoals(float DeltaTime)
 {
 	Super::SteerTowardsGoals(DeltaTime);
-
+	
 	FVector RelativePositionOfPrey = GetRelativePositionOfPrey();
 	RelativePositionOfPrey.Normalize();
 	Velocity += RelativePositionOfPrey * SteeringStrength * DeltaTime;
