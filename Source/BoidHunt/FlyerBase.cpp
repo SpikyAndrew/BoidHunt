@@ -3,6 +3,7 @@
 
 #include "FlyerBase.h"
 
+#include "BoidHuntGameState.h"
 #include "BoidManager.h"
 #include "Math/Bounds.h"
 

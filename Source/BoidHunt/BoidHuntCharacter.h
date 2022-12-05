@@ -6,6 +6,7 @@
 #include "BoidManager.h"
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "BoidHuntCharacter.generated.h"
 
@@ -19,6 +20,7 @@ public:
 	ABoidHuntCharacter();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void TryWallJump();
 	void OnJumpAction();
 	void OnMoveAction(const FInputActionValue& InputActionValue);
 	FVector GetFiringLocation() const;
@@ -28,12 +30,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PawnClientRestart() override;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-
+	
 	UPROPERTY(EditAnywhere)
 	UInputAction* MoveAction;
 	UPROPERTY(EditAnywhere)
@@ -45,7 +46,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere)
+	float WallJumpImpulse;
+	UPROPERTY(EditAnywhere)
+	// ReSharper disable once UnrealHeaderToolError
 	UInputMappingContext* InputMappingContext;
-	UPROPERTY()
 	ABoidManager* BoidManager = nullptr;
 };

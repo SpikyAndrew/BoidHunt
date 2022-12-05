@@ -4,12 +4,15 @@
 #include "BoidHuntCharacter.h"
 
 #include "BoidHuntGameState.h"
+#include "BoidHuntUI.h"
 #include "BoidManagerSubsystem.h"
+#include "Building.h"
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "ToolBuilderUtil.h"
 #include "GameFramework/CharacterMovementComponent.h"
+
 
 // Sets default values
 ABoidHuntCharacter::ABoidHuntCharacter()
@@ -24,16 +27,47 @@ void ABoidHuntCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+
 // Called every frame
 void ABoidHuntCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void ABoidHuntCharacter::TryWallJump()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FHitResult Hit;
+
+		FCollisionQueryParams Params;
+		double HalfHeight = GetSimpleCollisionHalfHeight();
+
+		World->SweepSingleByObjectType(
+			Hit,
+			GetActorLocation() + HalfHeight * FVector::UpVector,
+			GetActorLocation() - GetActorForwardVector(),
+			FRotator::ZeroRotator.Quaternion(),
+			ECC_WorldStatic,
+			FCollisionShape::MakeSphere(HalfHeight)
+			);
+
+		if (Cast<ABuilding>(Hit.GetActor()))
+		{
+			FVector Impulse = (Hit.ImpactNormal+FVector::UpVector) * WallJumpImpulse;
+			GetCharacterMovement()->StopMovementImmediately();
+			GetCharacterMovement()->AddImpulse(Impulse);
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *Impulse.ToString());
+		}
+	}
 }
 
 void ABoidHuntCharacter::OnJumpAction()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Jumpy jump"));
+	if (!GetMovementComponent()->IsMovingOnGround())
+		TryWallJump();
+	
 	Jump();
 }
 
@@ -59,10 +93,12 @@ void ABoidHuntCharacter::OnFireAction()
 			BoidManager = GameState->BoidManager;
 	}
 	BoidManager->SpawnFalcon(GetFiringLocation(), GetBaseAimRotation().Vector());
+	GetCharacterMovement()->AddImpulse(-GetBaseAimRotation().Vector()*10000);
 }
 
 void ABoidHuntCharacter::OnGlideAction()
 {
+	
 }
 
 void ABoidHuntCharacter::OnLookAction(const FInputActionValue& InputActionValue)
@@ -85,13 +121,13 @@ void ABoidHuntCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
     {
         if (JumpAction)
             PlayerEnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABoidHuntCharacter::OnJumpAction);
-		if (MoveAction)
+        if (GlideAction)
+	        PlayerEnhancedInputComponent->BindAction(GlideAction, ETriggerEvent::Started, this, &ABoidHuntCharacter::OnGlideAction);
+        if (MoveAction)
 			PlayerEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnMoveAction);
-		if (FireAction)
+        if (FireAction)
 			PlayerEnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnFireAction);
-		if (GlideAction)
-			PlayerEnhancedInputComponent->BindAction(GlideAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnGlideAction);
-		if (GlideAction)
+        if (GlideAction)
 			PlayerEnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnLookAction);
 
     }

@@ -17,6 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	ABoid();
 	void BeginPlay();
+	virtual void Deactivate() override;
 
 protected:
 	virtual void SteerTowardsGoals(float DeltaTime) override;

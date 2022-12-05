@@ -4,6 +4,7 @@
 #include "Falcon.h"
 
 #include "Boid.h"
+#include "BoidHuntGameState.h"
 #include "BoidManagerSubsystem.h"
 
 #include "Math/NumericLimits.h"
@@ -35,6 +36,17 @@ void AFalcon::BeginPlay()
 	Super::BeginPlay();
 	Collider->OnComponentHit.AddUniqueDynamic(this, &AFalcon::OnHitCheckForBoid);
 	Energy = StartingEnergy;
+}
+
+void AFalcon::Deactivate()
+{
+	Super::Deactivate();
+	if (UWorld* World = GetWorld())
+	{
+		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
+		if (GameState)
+			GameState->AddFalcons(-1);
+	}
 }
 
 void AFalcon::Initialize(ABoidManager* Manager, const FVector& Direction)

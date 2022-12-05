@@ -129,3 +129,14 @@ void ABoid::ApplyCohesionRule(float DeltaTime)
 	Center /= OthersInCohesion;
 	Velocity += (Center - GetActorLocation()) * DeltaTime * CohesionStrength;
 }
+
+void ABoid::Deactivate()
+{
+	Super::Deactivate();
+	if (UWorld* World = GetWorld())
+	{
+		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
+		if (GameState)
+			GameState->AddBoids(-1);
+	}
+}

@@ -16,6 +16,15 @@ class BOIDHUNT_API ABoidHuntGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+	void AddBoids(int Number);
+	void AddFalcons(int Number);
+	int GetNumberOfBoids();
+	int GetNumberOfFalcons();
+
 	UPROPERTY()
 	ABoidManager* BoidManager;
+
+protected:
+	int NumberOfBoids;
+	int NumberOfFalcons;
 };

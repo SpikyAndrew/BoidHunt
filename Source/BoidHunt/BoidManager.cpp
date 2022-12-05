@@ -45,6 +45,9 @@ void ABoidManager::SpawnBoid(FVector Location)
 		ABoid* Boid = World->SpawnActor<ABoid>(BoidBlueprint, Location, FRotator::ZeroRotator, Parameters);
 		Boid->Initialize(this);
 		Boids.Add(Boid);
+		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
+		if (GameState)
+			GameState->AddBoids(1);
 	}
 }
 
@@ -56,6 +59,9 @@ void ABoidManager::SpawnFalcon(FVector Location, FVector Direction)
 		AFalcon* Falcon = World->SpawnActor<AFalcon>(FalconBlueprint, Location, FRotator::ZeroRotator, Parameters);
 		Falcon->Initialize(this, Direction);
 		Falcons.Add(Falcon);
+		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
+		if (GameState)
+			GameState->AddFalcons(1);
 	}
 }
 
