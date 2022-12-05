@@ -13,9 +13,11 @@ void ABoidHuntGameState::AddBoids(int Number)
 	if (HUD)
 	{
 		HUD->SetBoids(NumberOfBoids);
-        if(NumberOfBoids < 1)
-		    HUD->ShowVictoryText();
-    }
+		if (NumberOfBoids < 1)
+		{
+			HUD->ShowVictoryText();
+		}
+	}
 }
 
 void ABoidHuntGameState::AddFalcons(int Number)
@@ -24,7 +26,9 @@ void ABoidHuntGameState::AddFalcons(int Number)
 	ABoidHuntHUD* HUD = Cast<ABoidHuntHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
 	if (HUD)
+	{
 		HUD->SetFalcons(NumberOfFalcons);
+	}
 }
 
 void ABoidHuntGameState::SetFuel(double JetpackFuel, double MaxJetpackFuel)
@@ -32,7 +36,9 @@ void ABoidHuntGameState::SetFuel(double JetpackFuel, double MaxJetpackFuel)
 	ABoidHuntHUD* HUD = Cast<ABoidHuntHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
 	if (HUD)
+	{
 		HUD->SetFuel(JetpackFuel, MaxJetpackFuel);
+	}
 }
 
 int ABoidHuntGameState::GetNumberOfBoids()

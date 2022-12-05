@@ -13,8 +13,8 @@ UCLASS()
 class BOIDHUNT_API ABoidManager : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ABoidManager();
 	FBounds3d GetBounds() const;

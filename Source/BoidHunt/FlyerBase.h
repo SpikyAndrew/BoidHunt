@@ -13,13 +13,14 @@ UCLASS()
 class BOIDHUNT_API AFlyerBase : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AFlyerBase();
-	
+
 	UFUNCTION()
-	void BounceOnHit(UPrimitiveComponent* PrimitiveComponent, AActor* Actor, UPrimitiveComponent* PrimitiveComponent1, FVector Vector, const FHitResult& HitResult);
+	void BounceOnHit(UPrimitiveComponent* PrimitiveComponent, AActor* Actor, UPrimitiveComponent* PrimitiveComponent1,
+	                 FVector Vector, const FHitResult& HitResult);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -30,7 +31,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual	void SteerTowardsGoals(float DeltaTime);
+	virtual void SteerTowardsGoals(float DeltaTime);
 	bool StayInBounds(float DeltaTime);
 	bool AvoidObstacles(float DeltaTime);
 	void MoveWithVelocity(float DeltaTime);
@@ -40,7 +41,7 @@ protected:
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* Collider;
-	
+
 	UPROPERTY(EditAnywhere)
 	double MinVelocity;
 	UPROPERTY(EditAnywhere)

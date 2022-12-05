@@ -13,5 +13,4 @@ UCLASS()
 class BOIDHUNT_API ULevelBuilderSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
-	
 };

@@ -7,17 +7,20 @@
 #include "Components/TextBlock.h"
 
 
-
 void UBoidHuntUI::SetBoids(int Number)
 {
-    if (BoidCounter)
-	    BoidCounter->SetText(FText::AsNumber(Number));
+	if (BoidCounter)
+	{
+		BoidCounter->SetText(FText::AsNumber(Number));
+	}
 }
 
 void UBoidHuntUI::SetFalcons(int Number)
 {
-    if (FalconCounter)
-	    FalconCounter->SetText(FText::AsNumber(Number));
+	if (FalconCounter)
+	{
+		FalconCounter->SetText(FText::AsNumber(Number));
+	}
 }
 
 void UBoidHuntUI::ShowVictoryText()

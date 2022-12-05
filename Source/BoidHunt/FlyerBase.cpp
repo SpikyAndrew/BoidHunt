@@ -10,9 +10,9 @@
 // Sets default values
 AFlyerBase::AFlyerBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
 
@@ -33,18 +33,20 @@ void AFlyerBase::BeginPlay()
 void AFlyerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	IsAvoiding =  AvoidObstacles(DeltaTime);
+	IsAvoiding = AvoidObstacles(DeltaTime);
 
 	if (BoidManager)
 	{
 		IsOutOfBounds = StayInBounds(DeltaTime);
 		if (!IsAvoiding && !IsOutOfBounds)
+		{
 			SteerTowardsGoals(DeltaTime);
+		}
 	}
 
 	double MaxVelocity = FMath::Lerp(MaxVelocityDownwards, MaxVelocityUpwards,
-		(1 + Velocity.GetClampedToSize(1,1).Dot(FVector::UpVector))/2);
-	Velocity = Velocity.GetClampedToSize(MinVelocity,MaxVelocity);
+	                                 (1 + Velocity.GetClampedToSize(1, 1).Dot(FVector::UpVector)) / 2);
+	Velocity = Velocity.GetClampedToSize(MinVelocity, MaxVelocity);
 	MoveWithVelocity(DeltaTime);
 	LookForward();
 }
@@ -53,7 +55,9 @@ void AFlyerBase::Tick(float DeltaTime)
 void AFlyerBase::Initialize(ABoidManager* Manager)
 {
 	if (!BoidManager)
+	{
 		BoidManager = Manager;
+	}
 }
 
 bool AFlyerBase::GetIsAlive() const
@@ -67,7 +71,7 @@ bool AFlyerBase::StayInBounds(float DeltaTime)
 
 	const FBounds3d Bounds = BoidManager->GetBounds();
 	IsOutOfBounds = false;
-	
+
 	if (Location.X < Bounds.Min.X)
 	{
 		IsOutOfBounds = true;
@@ -76,7 +80,7 @@ bool AFlyerBase::StayInBounds(float DeltaTime)
 	else if (Location.X > Bounds.Max.X)
 	{
 		IsOutOfBounds = true;
-	Velocity -= FVector::ForwardVector * BoundsStrength * DeltaTime;
+		Velocity -= FVector::ForwardVector * BoundsStrength * DeltaTime;
 	}
 
 
@@ -91,7 +95,7 @@ bool AFlyerBase::StayInBounds(float DeltaTime)
 		Velocity -= FVector::RightVector * BoundsStrength * DeltaTime;
 	}
 
-	
+
 	if (Location.Z < Bounds.Min.Z)
 	{
 		IsOutOfBounds = true;
@@ -126,10 +130,13 @@ bool AFlyerBase::AvoidObstacles(float DeltaTime)
 	const FVector Start = GetActorLocation();
 	const FVector End = Start + Velocity * BuildingAvoidanceEagerness;
 	FCollisionQueryParams TraceParams;
-	bool bIsHit = GetWorld()->SweepSingleByObjectType(HitDetails, Start, End, GetActorRotation().Quaternion(), ECC_WorldStatic, Collider->GetCollisionShape());
+	bool bIsHit = GetWorld()->SweepSingleByObjectType(HitDetails, Start, End, GetActorRotation().Quaternion(),
+	                                                  ECC_WorldStatic, Collider->GetCollisionShape());
 
 	if (!bIsHit)
+	{
 		return false;
+	}
 
 	Velocity += HitDetails.ImpactNormal.Cross(GetActorForwardVector()) * BuildingAvoidanceStrength * DeltaTime;
 	return true;
@@ -137,20 +144,19 @@ bool AFlyerBase::AvoidObstacles(float DeltaTime)
 
 void AFlyerBase::LookForward()
 {
-	SetActorRotation(Velocity.Rotation().Add(-90,0,0));
+	SetActorRotation(Velocity.Rotation().Add(-90, 0, 0));
 }
 
 void AFlyerBase::SteerTowardsGoals(float DeltaTime)
 {
-	
 }
 
 void AFlyerBase::BounceOnHit(UPrimitiveComponent* PrimitiveComponent, AActor* Actor,
-                       UPrimitiveComponent* PrimitiveComponent1, FVector Vector, const FHitResult& HitResult)
+                             UPrimitiveComponent* PrimitiveComponent1, FVector Vector, const FHitResult& HitResult)
 {
 	FVector Normal = HitResult.ImpactNormal;
 	double VelocityMagnitude = Velocity.Length();
-	FVector NormalizedVelocity = Velocity.GetClampedToSize(1,1);
+	FVector NormalizedVelocity = Velocity.GetClampedToSize(1, 1);
 
 	Velocity = NormalizedVelocity - 2 * Normal * Normal.Dot(NormalizedVelocity);
 	AddActorWorldOffset(Normal);

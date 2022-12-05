@@ -12,11 +12,11 @@ UCLASS()
 class BOIDHUNT_API ABoid : public AFlyerBase
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ABoid();
-	void BeginPlay();
+	virtual void BeginPlay() override;
 	virtual void Deactivate() override;
 
 protected:

@@ -34,7 +34,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
 	UPROPERTY(EditAnywhere)
 	UInputAction* MoveAction;
 	UPROPERTY(EditAnywhere)
@@ -48,9 +48,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	double WallJumpImpulse;
 	UPROPERTY(EditAnywhere)
-    double MaxJetpackFuel;
+	double MaxJetpackFuel;
 	UPROPERTY(EditAnywhere)
-    double JetpackFuelGainPerSecond;
+	double JetpackFuelGainPerSecond;
 	UPROPERTY(EditAnywhere)
 	double JetpackFuelUnlockThreshold;
 	UPROPERTY(EditAnywhere)
@@ -60,10 +60,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	// ReSharper disable once UnrealHeaderToolError
 	UInputMappingContext* InputMappingContext;
-	
+
 	ABoidManager* BoidManager = nullptr;
-	
+
 	double JetpackFuel;
 	bool IsJetpackLockedOut;
-
 };

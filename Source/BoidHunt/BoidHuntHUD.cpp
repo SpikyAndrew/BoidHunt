@@ -7,7 +7,6 @@
 #include "Blueprint/UserWidget.h"
 
 
-
 void ABoidHuntHUD::BeginPlay()
 {
 	Super::BeginPlay();
@@ -22,7 +21,6 @@ void ABoidHuntHUD::BeginPlay()
 				UI->SetBoids(GameState->GetNumberOfBoids());
 				UI->SetFalcons(GameState->GetNumberOfFalcons());
 			}
-
 		}
 	}
 }
@@ -56,11 +54,15 @@ void ABoidHuntHUD::SetAmmo(int Ammo)
 void ABoidHuntHUD::SetBoids(int Number)
 {
 	if (UI)
+	{
 		UI->SetBoids(Number);
+	}
 }
 
 void ABoidHuntHUD::SetFalcons(int Number)
 {
 	if (UI)
+	{
 		UI->SetFalcons(Number);
+	}
 }

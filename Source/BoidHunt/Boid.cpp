@@ -26,14 +26,16 @@ void ABoid::BeginPlay()
 bool ABoid::AvoidFalcons(double DeltaTime)
 {
 	bool IsAvoidingFalcons = false;
-	
+
 	for (AFalcon* Falcon : *BoidManager->GetFalcons())
 	{
 		if (!Falcon->GetIsAlive())
+		{
 			continue;
-		
+		}
+
 		FVector LocationDiff = Falcon->GetActorLocation() - GetActorLocation();
-		
+
 		if (LocationDiff.Length() < FalconAvoidanceRadius)
 		{
 			LocationDiff.Normalize();
@@ -42,7 +44,7 @@ bool ABoid::AvoidFalcons(double DeltaTime)
 			DrawDebugLine(GetWorld(), GetActorLocation(), Falcon->GetActorLocation(), FColor::Green, false, -1, 0, 5);
 		}
 	}
-	
+
 	return IsAvoidingFalcons;
 }
 
@@ -70,7 +72,7 @@ void ABoid::ApplySeparationRule(float DeltaTime)
 			const double Distance = LocationDifference.Length();
 			if (Distance < SeparationRadius)
 			{
-				 Velocity -= LocationDifference * DeltaTime * SeparationStrength;
+				Velocity -= LocationDifference * DeltaTime * SeparationStrength;
 			}
 		}
 	}
@@ -95,10 +97,12 @@ void ABoid::ApplyAlignmentRule(float DeltaTime)
 			}
 		}
 	}
-	
+
 	if (OthersInCohesion == 0)
+	{
 		return;
-	
+	}
+
 	AverageVelocity /= OthersInCohesion;
 	AverageVelocity -= Velocity / 8;
 	Velocity += AverageVelocity * DeltaTime * AlignmentStrength;
@@ -125,7 +129,9 @@ void ABoid::ApplyCohesionRule(float DeltaTime)
 	}
 
 	if (OthersInCohesion == 0)
+	{
 		return;
+	}
 	Center /= OthersInCohesion;
 	Velocity += (Center - GetActorLocation()) * DeltaTime * CohesionStrength;
 }
@@ -137,6 +143,8 @@ void ABoid::Deactivate()
 	{
 		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
 		if (GameState)
+		{
 			GameState->AddBoids(-1);
+		}
 	}
 }

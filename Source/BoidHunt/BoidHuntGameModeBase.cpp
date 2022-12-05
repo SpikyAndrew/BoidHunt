@@ -2,4 +2,3 @@
 
 
 #include "BoidHuntGameModeBase.h"
-

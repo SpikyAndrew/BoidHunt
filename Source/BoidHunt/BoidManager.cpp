@@ -10,7 +10,7 @@
 // Sets default values
 ABoidManager::ABoidManager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
@@ -18,8 +18,10 @@ ABoidManager::ABoidManager()
 
 FBounds3d ABoidManager::GetBounds() const
 {
-	if (LevelBuilder!=nullptr)
+	if (LevelBuilder != nullptr)
+	{
 		return LevelBuilder->GetBounds();
+	}
 
 	FBounds3d Bounds = FBounds3d();
 	Bounds.Max = FVector(MAX_dbl, MAX_dbl, MAX_dbl);
@@ -47,7 +49,9 @@ void ABoidManager::SpawnBoid(FVector Location)
 		Boids.Add(Boid);
 		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
 		if (GameState)
+		{
 			GameState->AddBoids(1);
+		}
 	}
 }
 
@@ -61,7 +65,9 @@ void ABoidManager::SpawnFalcon(FVector Location, FVector Direction)
 		Falcons.Add(Falcon);
 		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
 		if (GameState)
+		{
 			GameState->AddFalcons(1);
+		}
 	}
 }
 
@@ -75,7 +81,7 @@ void ABoidManager::BeginPlay()
 	{
 		GameState->BoidManager = this;
 	}
-	
+
 	SpawnBoids();
 }
 
@@ -87,16 +93,15 @@ void ABoidManager::SpawnBoids()
 		{
 			const FVector Center = this->GetTransform().GetLocation();
 			FVector Ranges = BoxDimensions / 2;
-			
-			for(int i = 0; i<BoidCount; i++)
+
+			for (int i = 0; i < BoidCount; i++)
 			{
 				FVector SpawnLocation = Center
-					+ FVector::RightVector * FMath::RandRange(-Ranges.X,Ranges.X)
-					+ FVector::ForwardVector * FMath::RandRange(-Ranges.Y,Ranges.Y)
-					+ FVector::UpVector * FMath::RandRange(-Ranges.Z,Ranges.Z);
+					+ FVector::RightVector * FMath::RandRange(-Ranges.X, Ranges.X)
+					+ FVector::ForwardVector * FMath::RandRange(-Ranges.Y, Ranges.Y)
+					+ FVector::UpVector * FMath::RandRange(-Ranges.Z, Ranges.Z);
 				SpawnBoid(SpawnLocation);
 			}
 		}
 	}
 }
-

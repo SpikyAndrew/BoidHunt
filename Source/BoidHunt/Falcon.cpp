@@ -17,10 +17,10 @@ AFalcon::AFalcon()
 }
 
 void AFalcon::OnHitCheckForBoid(UPrimitiveComponent* PrimitiveComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComponent, FVector Vector, const FHitResult& HitResult)
+                                UPrimitiveComponent* OtherComponent, FVector Vector, const FHitResult& HitResult)
 {
 	ABoid* BoidHit = Cast<ABoid>(OtherActor);
-	if(BoidHit)
+	if (BoidHit)
 	{
 		BoidHit->Deactivate();
 		Energy += EnergyGainPerKill;
@@ -47,15 +47,19 @@ void AFalcon::Deactivate()
 	{
 		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
 		if (GameState)
+		{
 			GameState->AddFalcons(-1);
+		}
 	}
 }
 
 void AFalcon::Initialize(ABoidManager* Manager, const FVector& Direction)
 {
 	if (BoidManager)
+	{
 		return;
-	
+	}
+
 	BoidManager = Manager;
 	Velocity = Direction * MaxVelocityDownwards;
 }
@@ -63,7 +67,7 @@ void AFalcon::Initialize(ABoidManager* Manager, const FVector& Direction)
 void AFalcon::Tick(float DeltaSeconds)
 {
 	NoSteeringTimer -= DeltaSeconds;
-	
+
 	PreviousVelocity = Velocity;
 
 	if (NoSteeringTimer > 0)
@@ -72,9 +76,9 @@ void AFalcon::Tick(float DeltaSeconds)
 		LookForward();
 		return;
 	}
-	
+
 	Super::Tick(DeltaSeconds);
-	
+
 	Energy -= (Velocity - PreviousVelocity).Length();
 	if (Energy < 0)
 	{
@@ -86,7 +90,7 @@ void AFalcon::Tick(float DeltaSeconds)
 void AFalcon::SteerTowardsGoals(float DeltaTime)
 {
 	Super::SteerTowardsGoals(DeltaTime);
-	
+
 	FVector RelativePositionOfPrey = GetRelativePositionOfPrey();
 	RelativePositionOfPrey.Normalize();
 	Velocity += RelativePositionOfPrey * SteeringStrength * DeltaTime;
@@ -98,12 +102,14 @@ FVector AFalcon::GetRelativePositionOfPrey() const
 	double MinSquaredDistance = MAX_dbl;
 	// In case we never find a target, fly forward.
 	FVector RelativePositionOfPrey = GetActorForwardVector();
-	
+
 	for (const ABoid* Boid : *BoidManager->GetBoids())
 	{
 		if (!Boid->GetIsAlive())
+		{
 			continue;
-		
+		}
+
 		FVector RelativePosition = Boid->GetActorLocation() - Location;
 		const double SquaredDistance = RelativePosition.SquaredLength();
 		if (SquaredDistance < MinSquaredDistance)

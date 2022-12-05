@@ -18,7 +18,7 @@
 // Sets default values
 ABoidHuntCharacter::ABoidHuntCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -43,12 +43,12 @@ void ABoidHuntCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	JetpackFuel += DeltaTime * JetpackFuelGainPerSecond;
-	
+
 	if (JetpackFuel > MaxJetpackFuel)
 	{
 		JetpackFuel = MaxJetpackFuel;
 	}
-	
+
 	if (UWorld* World = GetWorld())
 	{
 		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
@@ -57,7 +57,7 @@ void ABoidHuntCharacter::Tick(float DeltaTime)
 			GameState->SetFuel(JetpackFuel, MaxJetpackFuel);
 		}
 	}
-	
+
 	if (IsJetpackLockedOut && JetpackFuel > JetpackFuelUnlockThreshold)
 	{
 		IsJetpackLockedOut = false;
@@ -81,11 +81,11 @@ void ABoidHuntCharacter::TryWallJump()
 			FRotator::ZeroRotator.Quaternion(),
 			ECC_WorldStatic,
 			FCollisionShape::MakeSphere(HalfHeight)
-			);
+		);
 
 		if (Cast<ABuilding>(Hit.GetActor()))
 		{
-			FVector Impulse = (Hit.ImpactNormal+FVector::UpVector) * WallJumpImpulse;
+			FVector Impulse = (Hit.ImpactNormal + FVector::UpVector) * WallJumpImpulse;
 			GetCharacterMovement()->StopMovementImmediately();
 			GetCharacterMovement()->AddImpulse(Impulse);
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *Impulse.ToString());
@@ -96,9 +96,13 @@ void ABoidHuntCharacter::TryWallJump()
 void ABoidHuntCharacter::OnJumpAction()
 {
 	if (!GetMovementComponent()->IsMovingOnGround())
+	{
 		TryWallJump();
+	}
 	else
+	{
 		Jump();
+	}
 }
 
 void ABoidHuntCharacter::OnMoveAction(const FInputActionValue& InputActionValue)
@@ -111,13 +115,15 @@ void ABoidHuntCharacter::OnMoveAction(const FInputActionValue& InputActionValue)
 
 FVector ABoidHuntCharacter::GetFiringLocation() const
 {
-	return GetActorLocation() + BaseEyeHeight*FVector::UpVector;
+	return GetActorLocation() + BaseEyeHeight * FVector::UpVector;
 }
 
 void ABoidHuntCharacter::OnFireAction()
 {
 	if (Ammo < 1)
+	{
 		return;
+	}
 	Ammo--;
 
 	UWorld* World = GetWorld();
@@ -125,7 +131,9 @@ void ABoidHuntCharacter::OnFireAction()
 	{
 		ABoidHuntGameState* GameState = static_cast<ABoidHuntGameState*>(World->GetGameState());
 		if (GameState)
+		{
 			BoidManager = GameState->BoidManager;
+		}
 		ABoidHuntHUD* HUD = Cast<ABoidHuntHUD>(World->GetFirstPlayerController()->GetHUD());
 		if (HUD)
 		{
@@ -146,15 +154,19 @@ void ABoidHuntCharacter::OnFireAction()
 void ABoidHuntCharacter::OnGlideAction()
 {
 	if (IsJetpackLockedOut)
+	{
 		return;
-	
+	}
+
 	if (UWorld* World = GetWorld())
 	{
 		// Spend 1 Fuel per second plus cancel fuel gains from this tick.		
-		JetpackFuel -= World->GetDeltaSeconds() * (1+JetpackFuelGainPerSecond);
-		GetCharacterMovement()->AddImpulse(FVector::UpVector*JetpackForce);
+		JetpackFuel -= World->GetDeltaSeconds() * (1 + JetpackFuelGainPerSecond);
+		GetCharacterMovement()->AddImpulse(FVector::UpVector * JetpackForce);
 		if (JetpackFuel < 0)
+		{
 			IsJetpackLockedOut = true;
+		}
 	}
 }
 
@@ -175,19 +187,33 @@ void ABoidHuntCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (UEnhancedInputComponent* PlayerEnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-    {
-        if (JumpAction)
-            PlayerEnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ABoidHuntCharacter::OnJumpAction);
-        if (GlideAction)
-	        PlayerEnhancedInputComponent->BindAction(GlideAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnGlideAction);
-        if (MoveAction)
-			PlayerEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnMoveAction);
-        if (FireAction)
-			PlayerEnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnFireAction);
-        if (GlideAction)
-			PlayerEnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABoidHuntCharacter::OnLookAction);
-
-    }
+	{
+		if (JumpAction)
+		{
+			PlayerEnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this,
+			                                         &ABoidHuntCharacter::OnJumpAction);
+		}
+		if (GlideAction)
+		{
+			PlayerEnhancedInputComponent->BindAction(GlideAction, ETriggerEvent::Triggered, this,
+			                                         &ABoidHuntCharacter::OnGlideAction);
+		}
+		if (MoveAction)
+		{
+			PlayerEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this,
+			                                         &ABoidHuntCharacter::OnMoveAction);
+		}
+		if (FireAction)
+		{
+			PlayerEnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this,
+			                                         &ABoidHuntCharacter::OnFireAction);
+		}
+		if (GlideAction)
+		{
+			PlayerEnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this,
+			                                         &ABoidHuntCharacter::OnLookAction);
+		}
+	}
 }
 
 void ABoidHuntCharacter::PawnClientRestart()
@@ -198,7 +224,8 @@ void ABoidHuntCharacter::PawnClientRestart()
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		// Get the Enhanced Input Local Player Subsystem from the Local Player related to our Player Controller.
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+			UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
 			// PawnClientRestart can run more than once in an Actor's lifetime, so start by clearing out any leftover mappings.
 			Subsystem->ClearAllMappings();

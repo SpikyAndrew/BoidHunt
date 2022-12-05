@@ -16,13 +16,14 @@ class BOIDHUNT_API AFalcon : public AFlyerBase
 public:
 	AFalcon();
 	UFUNCTION()
-	void OnHitCheckForBoid(UPrimitiveComponent* PrimitiveComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector Vector, const FHitResult& HitResult);
+	void OnHitCheckForBoid(UPrimitiveComponent* PrimitiveComponent, AActor* OtherActor,
+	                       UPrimitiveComponent* OtherComponent, FVector Vector, const FHitResult& HitResult);
 	virtual void BeginPlay() override;
 	virtual void Deactivate() override;
 	void Initialize(ABoidManager* Manager, const FVector& Direction);
 protected:
 	virtual void Tick(float DeltaSeconds) override;
-	virtual	void SteerTowardsGoals(float DeltaTime) override;
+	virtual void SteerTowardsGoals(float DeltaTime) override;
 	FVector GetRelativePositionOfPrey() const;
 
 	UPROPERTY(EditAnywhere)
@@ -33,7 +34,7 @@ protected:
 	double SteeringStrength;
 	UPROPERTY(EditAnywhere)
 	double NoSteeringTimer;
-	
+
 	FVector PreviousVelocity;
 	double Energy;
 };

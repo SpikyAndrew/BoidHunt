@@ -11,12 +11,12 @@ UCLASS(Config=Game)
 class BOIDHUNT_API ALevelBuilder : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ALevelBuilder();
 	FBounds3d CalculateLevelBounds() const;
-	
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	FBounds3d GetBounds() const;
@@ -27,7 +27,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void Spawn();
-	
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ActorToSpawn;
 
@@ -38,7 +38,7 @@ protected:
 	double CellSize;
 	UPROPERTY(EditAnywhere)
 	double BuildingWidth;
-	
+
 	UPROPERTY(Config)
 	int Width;
 	UPROPERTY(Config)
@@ -47,6 +47,6 @@ protected:
 	TArray<double> BuildingHeights;
 
 	FBounds3d Bounds;
-	
+
 	const int MinLevelSize = 1;
 };
