@@ -132,7 +132,6 @@ void ABoid::ApplyCohesionRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> Bo
 		FIntVector2 Key = FIntVector2(PartitionKey.X + Direction.X, PartitionKey.Y + Direction.Y);
 		TArray<ABoid*> BoidArray;
 		BoidMap.MultiFind(Key, BoidArray);
-		UE_LOG(LogTemp, Warning, TEXT("Cohesion: %d"), BoidArray.Num());
 		for (const ABoid* Other : BoidArray)
 		{
 			if (Other != this)
