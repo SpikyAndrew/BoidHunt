@@ -6,9 +6,7 @@
 #include "BoidHuntGameState.h"
 #include "BoidHuntHUD.h"
 #include "BoidHuntUI.h"
-#include "BoidManagerSubsystem.h"
 #include "Building.h"
-#include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "ToolBuilderUtil.h"
@@ -74,6 +72,7 @@ void ABoidHuntCharacter::TryWallJump()
 		FCollisionQueryParams Params;
 		double HalfHeight = GetSimpleCollisionHalfHeight();
 
+		// Check if we're near a wall and get its normal.
 		World->SweepSingleByObjectType(
 			Hit,
 			GetActorLocation() + HalfHeight * FVector::UpVector,
@@ -106,7 +105,7 @@ void ABoidHuntCharacter::OnJumpAction()
 
 void ABoidHuntCharacter::OnMoveAction(const FInputActionValue& InputActionValue)
 {
-	FVector2D Direction = InputActionValue.Get<FVector2D>();
+	const FVector2D Direction = InputActionValue.Get<FVector2D>();
 	FVector Direction3D = FVector(Direction.X, Direction.Y, 0);
 	Direction3D = GetActorRotation().RotateVector(Direction3D);
 	AddMovementInput(Direction3D);
@@ -123,9 +122,10 @@ void ABoidHuntCharacter::OnFireAction()
 	{
 		return;
 	}
+	
 	Ammo--;
-
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
+	
 	if (World && BoidManager == nullptr)
 	{
 		ABoidHuntGameState* GameState = static_cast<ABoidHuntGameState*>(World->GetGameState());
@@ -139,6 +139,7 @@ void ABoidHuntCharacter::OnFireAction()
 			HUD->SetAmmo(Ammo);
 		}
 	}
+	
 	if (World)
 	{
 		ABoidHuntHUD* HUD = Cast<ABoidHuntHUD>(World->GetFirstPlayerController()->GetHUD());
@@ -147,6 +148,7 @@ void ABoidHuntCharacter::OnFireAction()
 			HUD->SetAmmo(Ammo);
 		}
 	}
+	
 	BoidManager->SpawnFalcon(GetFiringLocation(), GetBaseAimRotation().Vector());
 }
 
@@ -157,9 +159,9 @@ void ABoidHuntCharacter::OnGlideAction()
 		return;
 	}
 
-	if (UWorld* World = GetWorld())
+	if (const UWorld* World = GetWorld())
 	{
-		// Spend 1 Fuel per second plus cancel fuel gains from this tick.		
+		// Spend 1 Fuel/second plus all fuel gains from this tick.
 		JetpackFuel -= World->GetDeltaSeconds() * (1 + JetpackFuelGainPerSecond);
 		GetCharacterMovement()->AddImpulse(FVector::UpVector * JetpackForce);
 		if (JetpackFuel < 0)
@@ -171,7 +173,7 @@ void ABoidHuntCharacter::OnGlideAction()
 
 void ABoidHuntCharacter::OnLookAction(const FInputActionValue& InputActionValue)
 {
-	FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
+	const FVector2D LookAxisVector = InputActionValue.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -219,17 +221,13 @@ void ABoidHuntCharacter::PawnClientRestart()
 {
 	Super::PawnClientRestart();
 
-	// Make sure that we have a valid PlayerController.
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
-		// Get the Enhanced Input Local Player Subsystem from the Local Player related to our Player Controller.
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
 			UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
 			// PawnClientRestart can run more than once in an Actor's lifetime, so start by clearing out any leftover mappings.
 			Subsystem->ClearAllMappings();
-
-			// Add each mapping context, along with their priority values. Higher values outprioritize lower values.
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}

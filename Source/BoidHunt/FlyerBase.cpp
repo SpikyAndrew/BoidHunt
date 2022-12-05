@@ -47,8 +47,10 @@ void AFlyerBase::Tick(float DeltaTime)
 		}
 	}
 
-	double MaxVelocity = FMath::Lerp(MaxVelocityDownwards, MaxVelocityUpwards,
-	                                 (1 + Velocity.GetClampedToSize(1, 1).Dot(FVector::UpVector)) / 2);
+	// Upwardness == 1 when flying straight up, 0 when flying straight down, 0.5 when flying horizontally.
+	const double Upwardness = (1 + Velocity.GetClampedToSize(1, 1).Dot(FVector::UpVector)) / 2;
+
+	const double MaxVelocity = FMath::Lerp(MaxVelocityDownwards, MaxVelocityUpwards, Upwardness);
 	Velocity = Velocity.GetClampedToSize(MinVelocity, MaxVelocity);
 	MoveWithVelocity(DeltaTime);
 	LookForward();
@@ -158,9 +160,9 @@ void AFlyerBase::SteerTowardsGoals(float DeltaTime)
 void AFlyerBase::BounceOnHit(UPrimitiveComponent* PrimitiveComponent, AActor* Actor,
                              UPrimitiveComponent* PrimitiveComponent1, FVector Vector, const FHitResult& HitResult)
 {
-	FVector Normal = HitResult.ImpactNormal;
-	double VelocityMagnitude = Velocity.Length();
-	FVector NormalizedVelocity = Velocity.GetClampedToSize(1, 1);
+	const FVector Normal = HitResult.ImpactNormal;
+	const double VelocityMagnitude = Velocity.Length();
+	const FVector NormalizedVelocity = Velocity.GetClampedToSize(1, 1);
 
 	Velocity = NormalizedVelocity - 2 * Normal * Normal.Dot(NormalizedVelocity);
 	AddActorWorldOffset(Normal);

@@ -5,8 +5,6 @@
 #include "CoreMinimal.h"
 #include "BoidManager.h"
 #include "InputAction.h"
-#include "Camera/CameraComponent.h"
-#include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "BoidHuntCharacter.generated.h"
 
@@ -18,22 +16,25 @@ class BOIDHUNT_API ABoidHuntCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ABoidHuntCharacter();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	// Does a WallJump if near a wall.
 	void TryWallJump();
 	void OnJumpAction();
 	void OnMoveAction(const FInputActionValue& InputActionValue);
-	FVector GetFiringLocation() const;
 	void OnFireAction();
+	// Adds vertical velocity using the jetpack.
 	void OnGlideAction();
 	void OnLookAction(const FInputActionValue& InputActionValue);
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PawnClientRestart() override;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	// Returns the location from which Falcons are spawned.
+	FVector GetFiringLocation() const;
 
 	UPROPERTY(EditAnywhere)
 	UInputAction* MoveAction;
@@ -57,12 +58,13 @@ protected:
 	double JetpackForce;
 	UPROPERTY(EditAnywhere)
 	int Ammo;
-	UPROPERTY(EditAnywhere)
-	// ReSharper disable once UnrealHeaderToolError
+	UPROPERTY(EditAnywhere) // ReSharper disable once UnrealHeaderToolError
 	UInputMappingContext* InputMappingContext;
-
+	UPROPERTY()
 	ABoidManager* BoidManager = nullptr;
 
+	// Amount of seconds for which the player could use the jetpack.
 	double JetpackFuel;
+	// Set to true when out of Fuel, then false once Fuel reaches JetpackFuelUnlockThreshold.
 	bool IsJetpackLockedOut;
 };

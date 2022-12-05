@@ -8,9 +8,7 @@
 #include "BoidHuntUI.h"
 #include "BoidHuntHUD.generated.h"
 
-/**
- * 
- */
+// Used to hold the UMG UI widgets.
 UCLASS()
 class BOIDHUNT_API ABoidHuntHUD : public AHUD
 {

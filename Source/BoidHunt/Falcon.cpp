@@ -5,14 +5,11 @@
 
 #include "Boid.h"
 #include "BoidHuntGameState.h"
-#include "BoidManagerSubsystem.h"
 
 #include "Math/NumericLimits.h"
-#include "DrawDebugHelpers.h"
 
 AFalcon::AFalcon()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -24,7 +21,7 @@ void AFalcon::OnHitCheckForBoid(UPrimitiveComponent* PrimitiveComponent, AActor*
 	{
 		BoidHit->Deactivate();
 		Energy += EnergyGainPerKill;
-		// QOL: When we've hit a boid, start hunting normally.
+		// When we've hit a boid, start hunting normally.
 		NoSteeringTimer = 0;
 	}
 	else
@@ -104,28 +101,23 @@ FVector AFalcon::GetRelativePositionOfPrey() const
 	double MinSquaredDistance = MAX_dbl;
 	// In case we never find a target, fly forward.
 	FVector RelativePositionOfPrey = GetActorForwardVector();
-
-	for (FIntVector2 Direction : Directions)
+	TArray<ABoid*>* BoidArray = BoidManager->GetBoidArray();
+	
+	for (const ABoid* Boid : *BoidArray)
 	{
-		FIntVector2 Key = FIntVector2(PartitionKey.X + Direction.X, PartitionKey.Y + Direction.Y);
-		TArray<ABoid*> BoidArray;
-		BoidMap.MultiFind(Key, BoidArray);
-		for (const ABoid* Boid : BoidArray)
+		if (!Boid->GetIsAlive())
 		{
-			if (!Boid->GetIsAlive())
-			{
-				continue;
-			}
+			continue;
+		}
 
-			FVector RelativePosition = Boid->GetActorLocation() - Location;
-			const double SquaredDistance = RelativePosition.SquaredLength();
-			if (SquaredDistance < MinSquaredDistance)
-			{
-				MinSquaredDistance = SquaredDistance;
-				RelativePositionOfPrey = RelativePosition;
-			}
+		FVector RelativePosition = Boid->GetActorLocation() - Location;
+		const double SquaredDistance = RelativePosition.SquaredLength();
+		if (SquaredDistance < MinSquaredDistance)
+		{
+			MinSquaredDistance = SquaredDistance;
+			RelativePositionOfPrey = RelativePosition;
 		}
 	}
-	
+
 	return RelativePositionOfPrey;
 }

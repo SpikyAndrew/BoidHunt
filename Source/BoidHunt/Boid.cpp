@@ -4,21 +4,17 @@
 #include "Boid.h"
 
 #include "BoidHuntGameState.h"
-#include "BoidManagerSubsystem.h"
-#include "GameFramework/GameStateBase.h"
 #include "Falcon.h"
 
 ABoid::ABoid()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
 void ABoid::BeginPlay()
 {
 	Super::BeginPlay();
-	Collider->OnComponentHit.AddDynamic(this, &AFlyerBase::BounceOnHit);
+	Collider->OnComponentHit.AddUniqueDynamic(this, &AFlyerBase::BounceOnHit);
 }
 
 bool ABoid::AvoidFalcons(double DeltaTime)
@@ -39,7 +35,6 @@ bool ABoid::AvoidFalcons(double DeltaTime)
 			LocationDiff.Normalize();
 			Velocity -= LocationDiff * DeltaTime * FalconAvoidanceStrength;
 			IsAvoidingFalcons = true;
-			DrawDebugLine(GetWorld(), GetActorLocation(), Falcon->GetActorLocation(), FColor::Green, false, -1, 0, 5);
 		}
 	}
 
@@ -50,11 +45,11 @@ void ABoid::SteerTowardsGoals(float DeltaTime)
 {
 	Super::SteerTowardsGoals(DeltaTime);
 
-	bool IsAvoidingFalcons = AvoidFalcons(DeltaTime);
+	const bool IsAvoidingFalcons = AvoidFalcons(DeltaTime);
 
 	if (!IsAvoidingFalcons)
 	{
-		FIntVector2 PartitionKey = BoidManager->GetPartitionKeyFromLocation(GetActorLocation());
+		const FIntVector2 PartitionKey = BoidManager->GetPartitionKeyFromLocation(GetActorLocation());
 		TMultiMap<FIntVector2, ABoid*> BoidMap = *BoidManager->GetBoidMap();
 
 		ApplySeparationRule(DeltaTime, BoidMap, PartitionKey);
@@ -91,6 +86,7 @@ void ABoid::ApplyAlignmentRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> B
 	FVector AverageVelocity = FVector::Zero();
 	int OthersInCohesion = 0;
 
+	// Find the average velocity of Boids in FlockingRadius.
 	for (FIntVector2 Direction : Directions)
 	{
 		FIntVector2 Key = FIntVector2(PartitionKey.X + Direction.X, PartitionKey.Y + Direction.Y);
@@ -124,7 +120,7 @@ void ABoid::ApplyAlignmentRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> B
 
 void ABoid::ApplyCohesionRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> BoidMap, FIntVector2 PartitionKey)
 {
-	// Find the center of the nearby flock's mass.
+	// Find the center of mass for all boids within FlockingRadius.
 	FVector Center = FVector::Zero();
 	int OthersInCohesion = 0;
 	for (FIntVector2 Direction : Directions)

@@ -15,6 +15,7 @@ class BOIDHUNT_API ALevelBuilder : public AActor
 public:
 	// Sets default values for this actor's properties
 	ALevelBuilder();
+	// Returns max height for flying boids.
 	double GetMaxHeight() const;
 	FBounds3d CalculateLevelBounds() const;
 
@@ -23,31 +24,30 @@ public:
 	FBounds3d GetBounds() const;
 
 protected:
-	void ValidateAndFixConfig();
+	// Prints a warning message on screen.
 	static void PrintValidationWarning(FString Text);
+	// Fixes errors caused by bad config and shows debug messages about it.
+	void ValidateAndFixConfig();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	// Spawns buildings.
 	void Spawn();
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ActorToSpawn;
-
 	UPROPERTY(EditAnywhere)
 	USceneComponent* SceneComponent;
-
 	// Space between building spawn points on the grid.
 	UPROPERTY(EditAnywhere)
 	double CellSize;
 	// Horizontal scale applied to buildings.
 	UPROPERTY(EditAnywhere)
 	double BuildingWidth;
-
 	// "Soft" bounds for all flyers. They will prioritise maintaining these.
 	UPROPERTY(EditAnywhere)
 	double BoidMinimumAltitude;
 	UPROPERTY(EditAnywhere)
 	double BoidMaximumAltitudeAboveTallestBuilding;
-	
 	UPROPERTY(EditAnywhere)
 	double BuildingMeshHeight;
 	// Dimensions of the building grid.
