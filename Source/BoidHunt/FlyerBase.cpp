@@ -3,9 +3,11 @@
 
 #include "FlyerBase.h"
 
+#include "Boid.h"
 #include "BoidHuntGameState.h"
 #include "BoidManager.h"
 #include "Math/Bounds.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 AFlyerBase::AFlyerBase()
@@ -19,6 +21,7 @@ AFlyerBase::AFlyerBase()
 	RootComponent = Collider;
 	Mesh->SetupAttachment(Collider);
 	Mesh->SetRelativeLocation(FVector::ZeroVector);
+
 }
 
 // Called when the game starts or when spawned
@@ -116,6 +119,7 @@ void AFlyerBase::Deactivate()
 	SetActorTickEnabled(false);
 	Mesh->SetVisibility(false);
 	Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(ParticleSystem, Mesh, NAME_None, FVector(0.f), FRotator(0.f), EAttachLocation::Type::KeepRelativeOffset, true);
 }
 
 

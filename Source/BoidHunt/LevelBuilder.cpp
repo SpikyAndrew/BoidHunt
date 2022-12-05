@@ -11,11 +11,28 @@ ALevelBuilder::ALevelBuilder()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 }
 
+double ALevelBuilder::GetMaxHeight() const
+{
+	double MaxHeight = 0;
+	for (double Height : BuildingHeights)
+	{
+		if(Height > MaxHeight)
+		{
+			MaxHeight = Height;
+		}
+	}
+
+	MaxHeight = MaxHeight * BuildingMeshHeight + BoidMaximumAltitudeAboveTallestBuilding;
+	return MaxHeight;
+}
+
 FBounds3d ALevelBuilder::CalculateLevelBounds() const
 {
 	FBounds3d CalculatedBounds;
-	CalculatedBounds.Min = FVector(-Width / 2 * CellSize, -Length / 2 * CellSize, 5000);
-	CalculatedBounds.Max = FVector(Width / 2 * CellSize, Length / 2 * CellSize, 30000);
+	const double MaxHeight = GetMaxHeight();
+	
+	CalculatedBounds.Min = FVector(-Width / 2 * CellSize, -Length / 2 * CellSize, BoidMinimumAltitude);
+	CalculatedBounds.Max = FVector(Width / 2 * CellSize, Length / 2 * CellSize, MaxHeight);
 	return CalculatedBounds;
 }
 
@@ -39,18 +56,22 @@ void ALevelBuilder::Spawn()
 			const FVector Center = this->GetTransform().GetLocation();
 			FActorSpawnParameters Parameters;
 			Parameters.Owner = this;
-			FVector SpawnLocation;
 			for (int x = 0; x < Width; x++)
 			{
 				for (int y = 0; y < Length; y++)
 				{
-					SpawnLocation = Center
+					double Height = BuildingHeights[x + y * Width];
+					
+					if (Height <= 0)
+						continue;
+					
+					FVector SpawnLocation = Center
 						+ FVector::RightVector * (x - Width / 2) * CellSize
 						+ FVector::ForwardVector * (y - Length / 2) * CellSize;
 					AActor* Actor = World->SpawnActor<AActor>(ActorToSpawn, SpawnLocation, FRotator::ZeroRotator,
 					                                          Parameters);
 
-					Actor->SetActorScale3D(FVector(BuildingWidth, BuildingWidth, BuildingHeights[x + y * Width]));
+					Actor->SetActorScale3D(FVector(BuildingWidth, BuildingWidth, Height));
 				}
 			}
 		}

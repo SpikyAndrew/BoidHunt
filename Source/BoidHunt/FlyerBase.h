@@ -6,6 +6,8 @@
 #include "BoidManager.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
+#include "NiagaraSystem.h"
+#include "NiagaraSystem.h"
 #include "FlyerBase.generated.h"
 
 class ABoid;
@@ -41,7 +43,9 @@ protected:
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* Collider;
-
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* ParticleSystem;
+	
 	UPROPERTY(EditAnywhere)
 	double MinVelocity;
 	UPROPERTY(EditAnywhere)

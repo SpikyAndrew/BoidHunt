@@ -85,7 +85,7 @@ void ABoidHuntCharacter::TryWallJump()
 
 		if (Cast<ABuilding>(Hit.GetActor()))
 		{
-			FVector Impulse = (Hit.ImpactNormal + FVector::UpVector) * WallJumpImpulse;
+			FVector Impulse = (Hit.ImpactNormal * 2 + FVector::UpVector) * WallJumpImpulse;
 			GetCharacterMovement()->StopMovementImmediately();
 			GetCharacterMovement()->AddImpulse(Impulse);
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *Impulse.ToString());

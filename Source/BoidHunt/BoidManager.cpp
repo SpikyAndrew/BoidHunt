@@ -82,6 +82,8 @@ void ABoidManager::BeginPlay()
 		GameState->BoidManager = this;
 	}
 
+	AddActorWorldOffset(FVector::UpVector * LevelBuilder->GetMaxHeight());
+
 	SpawnBoids();
 }
 

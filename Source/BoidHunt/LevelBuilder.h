@@ -15,6 +15,7 @@ class BOIDHUNT_API ALevelBuilder : public AActor
 public:
 	// Sets default values for this actor's properties
 	ALevelBuilder();
+	double GetMaxHeight() const;
 	FBounds3d CalculateLevelBounds() const;
 
 	// Called every frame
@@ -34,15 +35,27 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* SceneComponent;
 
+	// Space between building spawn points on the grid.
 	UPROPERTY(EditAnywhere)
 	double CellSize;
+	// Horizontal scale applied to buildings.
 	UPROPERTY(EditAnywhere)
 	double BuildingWidth;
 
+	// "Soft" bounds for all flyers. They will prioritise maintaining these.
+	UPROPERTY(EditAnywhere)
+	double BoidMinimumAltitude;
+	UPROPERTY(EditAnywhere)
+	double BoidMaximumAltitudeAboveTallestBuilding;
+	
+	UPROPERTY(EditAnywhere)
+	double BuildingMeshHeight;
+	// Dimensions of the building grid.
 	UPROPERTY(Config)
 	int Width;
 	UPROPERTY(Config)
 	int Length;
+	// Vertical scaling to apply to buildings. Use as a two-dimensional array.
 	UPROPERTY(Config)
 	TArray<double> BuildingHeights;
 
