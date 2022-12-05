@@ -64,4 +64,17 @@ protected:
 	FVector Velocity;
 	bool IsAvoiding;
 	bool IsOutOfBounds;
+	
+	TArray<FIntVector2> Directions =
+    	{
+    		FIntVector2(0,0),
+    		FIntVector2(1,0),
+    		FIntVector2(-1,0),
+    		FIntVector2(0,1),
+    		FIntVector2(1,1),
+    		FIntVector2(-1,1),
+    		FIntVector2(0,-1),
+    		FIntVector2(1,-1),
+    		FIntVector2(-1,-1),
+    	};
 };

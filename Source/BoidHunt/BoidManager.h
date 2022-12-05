@@ -18,15 +18,18 @@ public:
 	// Sets default values for this actor's properties
 	ABoidManager();
 	FBounds3d GetBounds() const;
-	const TArray<const ABoid*>* GetBoids() const;
+	const TMultiMap<FIntVector2, ABoid*>* GetBoidMap() const;
 	const TArray<AFalcon*>* ABoidManager::GetFalcons() const;
+	FIntVector2 GetPartitionKeyFromLocation(FVector Location) const;
 	void SpawnBoid(FVector Location);
 	void SpawnFalcon(FVector Location, FVector Direction);
+	TArray<ABoid*>* GetBoidArray();
 
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 	void SpawnBoids();
 
 	UPROPERTY(EditAnywhere)
@@ -34,9 +37,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AFalcon> FalconBlueprint;
 	UPROPERTY(EditAnywhere)
+	double SpatialPartitionSize;
+	UPROPERTY(EditAnywhere)
 	int BoidCount;
-	UPROPERTY()
-	TArray<const ABoid*> Boids;
 	UPROPERTY()
 	TArray<AFalcon*> Falcons;
 	UPROPERTY(EditInstanceOnly)
@@ -46,4 +49,7 @@ protected:
 	FVector BoxDimensions;
 	UPROPERTY()
 	USceneComponent* SceneComponent;
+	UPROPERTY()
+	TArray<ABoid*> BoidArray;
+	TMultiMap<FIntVector2, ABoid*> BoidMap;
 };

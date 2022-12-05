@@ -29,9 +29,9 @@ FBounds3d ABoidManager::GetBounds() const
 	return Bounds;
 }
 
-const TArray<const ABoid*>* ABoidManager::GetBoids() const
+const TMultiMap<FIntVector2, ABoid*>* ABoidManager::GetBoidMap() const
 {
-	return &Boids;
+	return &BoidMap;
 }
 
 const TArray<AFalcon*>* ABoidManager::GetFalcons() const
@@ -46,7 +46,8 @@ void ABoidManager::SpawnBoid(FVector Location)
 		FActorSpawnParameters Parameters;
 		ABoid* Boid = World->SpawnActor<ABoid>(BoidBlueprint, Location, FRotator::ZeroRotator, Parameters);
 		Boid->Initialize(this);
-		Boids.Add(Boid);
+		BoidMap.Add(GetPartitionKeyFromLocation(Location), Boid);
+		BoidArray.Add(Boid);
 		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
 		if (GameState)
 		{
@@ -71,6 +72,11 @@ void ABoidManager::SpawnFalcon(FVector Location, FVector Direction)
 	}
 }
 
+TArray<ABoid*>* ABoidManager::GetBoidArray()
+{
+	return &BoidArray;
+}
+
 // Called when the game starts or when spawned
 void ABoidManager::BeginPlay()
 {
@@ -85,6 +91,20 @@ void ABoidManager::BeginPlay()
 	AddActorWorldOffset(FVector::UpVector * LevelBuilder->GetMaxHeight());
 
 	SpawnBoids();
+}
+
+void ABoidManager::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	BoidMap.Empty();
+	for (ABoid* Boid : BoidArray)
+	{
+		if(!Boid->GetIsAlive())
+			continue;
+		
+		FVector Location = Boid->GetActorLocation();
+		BoidMap.Add(GetPartitionKeyFromLocation(Location), Boid);
+	}
 }
 
 void ABoidManager::SpawnBoids()
@@ -106,4 +126,11 @@ void ABoidManager::SpawnBoids()
 			}
 		}
 	}
+}
+
+FIntVector2 ABoidManager::GetPartitionKeyFromLocation(FVector Location) const
+{
+	const int X = FMath::CeilToInt(Location.X / SpatialPartitionSize);
+	const int Y = FMath::CeilToInt(Location.Y / SpatialPartitionSize);
+	return FIntVector2(X,Y);
 }

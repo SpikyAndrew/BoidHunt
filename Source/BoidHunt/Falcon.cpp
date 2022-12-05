@@ -99,24 +99,33 @@ void AFalcon::SteerTowardsGoals(float DeltaTime)
 FVector AFalcon::GetRelativePositionOfPrey() const
 {
 	FVector Location = GetActorLocation();
+	FIntVector2 PartitionKey = BoidManager->GetPartitionKeyFromLocation(GetActorLocation());
+    TMultiMap<FIntVector2, ABoid*> BoidMap = *BoidManager->GetBoidMap();
 	double MinSquaredDistance = MAX_dbl;
 	// In case we never find a target, fly forward.
 	FVector RelativePositionOfPrey = GetActorForwardVector();
 
-	for (const ABoid* Boid : *BoidManager->GetBoids())
+	for (FIntVector2 Direction : Directions)
 	{
-		if (!Boid->GetIsAlive())
+		FIntVector2 Key = FIntVector2(PartitionKey.X + Direction.X, PartitionKey.Y + Direction.Y);
+		TArray<ABoid*> BoidArray;
+		BoidMap.MultiFind(Key, BoidArray);
+		for (const ABoid* Boid : BoidArray)
 		{
-			continue;
-		}
+			if (!Boid->GetIsAlive())
+			{
+				continue;
+			}
 
-		FVector RelativePosition = Boid->GetActorLocation() - Location;
-		const double SquaredDistance = RelativePosition.SquaredLength();
-		if (SquaredDistance < MinSquaredDistance)
-		{
-			MinSquaredDistance = SquaredDistance;
-			RelativePositionOfPrey = RelativePosition;
+			FVector RelativePosition = Boid->GetActorLocation() - Location;
+			const double SquaredDistance = RelativePosition.SquaredLength();
+			if (SquaredDistance < MinSquaredDistance)
+			{
+				MinSquaredDistance = SquaredDistance;
+				RelativePositionOfPrey = RelativePosition;
+			}
 		}
 	}
+	
 	return RelativePositionOfPrey;
 }

@@ -22,9 +22,9 @@ public:
 protected:
 	virtual void SteerTowardsGoals(float DeltaTime) override;
 	bool AvoidFalcons(double DeltaTime);
-	void ApplySeparationRule(float DeltaTime);
-	void ApplyAlignmentRule(float DeltaTime);
-	void ApplyCohesionRule(float DeltaTime);
+	void ApplySeparationRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> BoidMap, FIntVector2 PartitionKey);
+	void ApplyAlignmentRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> BoidMap, FIntVector2 PartitionKey);
+	void ApplyCohesionRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> BoidMap, FIntVector2 PartitionKey);
 
 	UPROPERTY(EditAnywhere)
 	double SeparationStrength;

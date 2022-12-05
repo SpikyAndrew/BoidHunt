@@ -14,13 +14,11 @@ ABoid::ABoid()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Sets default values
-
 // Called when the game starts or when spawned
 void ABoid::BeginPlay()
 {
 	Super::BeginPlay();
-	Collider->OnComponentHit.AddUniqueDynamic(this, &AFlyerBase::BounceOnHit);
+	Collider->OnComponentHit.AddDynamic(this, &AFlyerBase::BounceOnHit);
 }
 
 bool ABoid::AvoidFalcons(double DeltaTime)
@@ -56,44 +54,60 @@ void ABoid::SteerTowardsGoals(float DeltaTime)
 
 	if (!IsAvoidingFalcons)
 	{
-		ApplySeparationRule(DeltaTime);
-		ApplyAlignmentRule(DeltaTime);
-		ApplyCohesionRule(DeltaTime);
+		FIntVector2 PartitionKey = BoidManager->GetPartitionKeyFromLocation(GetActorLocation());
+		TMultiMap<FIntVector2, ABoid*> BoidMap = *BoidManager->GetBoidMap();
+
+		ApplySeparationRule(DeltaTime, BoidMap, PartitionKey);
+		ApplyAlignmentRule(DeltaTime, BoidMap, PartitionKey);
+		ApplyCohesionRule(DeltaTime, BoidMap, PartitionKey);
 	}
 }
 
-void ABoid::ApplySeparationRule(float DeltaTime)
+void ABoid::ApplySeparationRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> BoidMap, FIntVector2 PartitionKey)
 {
-	for (const ABoid* Other : *BoidManager->GetBoids())
+
+	for (FIntVector2 Direction : Directions)
 	{
-		if (Other != this && Other->GetIsAlive())
+		FIntVector2 Key = FIntVector2(PartitionKey.X + Direction.X, PartitionKey.Y + Direction.Y);
+		TArray<ABoid*> BoidArray;
+		BoidMap.MultiFind(Key, BoidArray);
+		for (const ABoid* Other : BoidArray)
 		{
-			FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
-			const double Distance = LocationDifference.Length();
-			if (Distance < SeparationRadius)
+			if (Other != this && Other->GetIsAlive())
 			{
-				Velocity -= LocationDifference * DeltaTime * SeparationStrength;
+				FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
+				const double Distance = LocationDifference.Length();
+				if (Distance < SeparationRadius)
+				{
+					Velocity -= LocationDifference * DeltaTime * SeparationStrength;
+				}
 			}
 		}
 	}
 }
 
-void ABoid::ApplyAlignmentRule(float DeltaTime)
+void ABoid::ApplyAlignmentRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> BoidMap, FIntVector2 PartitionKey)
 {
 	FVector AverageVelocity = FVector::Zero();
 	int OthersInCohesion = 0;
 
-	for (const ABoid* Other : *BoidManager->GetBoids())
+	for (FIntVector2 Direction : Directions)
 	{
-		if (Other != this)
+		FIntVector2 Key = FIntVector2(PartitionKey.X + Direction.X, PartitionKey.Y + Direction.Y);
+		TArray<ABoid*> BoidArray;
+		BoidMap.MultiFind(Key, BoidArray);
+		for (const ABoid* Other : BoidArray)
 		{
-			FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
-			const double Distance = LocationDifference.Length();
-
-			if (Distance < FlockingRadius)
+			if (Other != this)
 			{
-				AverageVelocity += Other->Velocity;
-				OthersInCohesion++;
+				FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
+				const double Distance = LocationDifference.Length();
+
+				if (Distance < FlockingRadius)
+				{
+					AverageVelocity += Other->Velocity;
+					OthersInCohesion++;
+				}
 			}
 		}
 	}
@@ -108,26 +122,33 @@ void ABoid::ApplyAlignmentRule(float DeltaTime)
 	Velocity += AverageVelocity * DeltaTime * AlignmentStrength;
 }
 
-void ABoid::ApplyCohesionRule(float DeltaTime)
+void ABoid::ApplyCohesionRule(float DeltaTime, TMultiMap<FIntVector2, ABoid*> BoidMap, FIntVector2 PartitionKey)
 {
 	// Find the center of the nearby flock's mass.
 	FVector Center = FVector::Zero();
 	int OthersInCohesion = 0;
-	for (const ABoid* Other : *BoidManager->GetBoids())
+	for (FIntVector2 Direction : Directions)
 	{
-		if (Other != this)
+		FIntVector2 Key = FIntVector2(PartitionKey.X + Direction.X, PartitionKey.Y + Direction.Y);
+		TArray<ABoid*> BoidArray;
+		BoidMap.MultiFind(Key, BoidArray);
+		UE_LOG(LogTemp, Warning, TEXT("Cohesion: %d"), BoidArray.Num());
+		for (const ABoid* Other : BoidArray)
 		{
-			FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
-			const double Distance = LocationDifference.Length();
-
-			if (Distance < FlockingRadius)
+			if (Other != this)
 			{
-				Center += Other->GetActorLocation();
-				OthersInCohesion++;
+				FVector LocationDifference = Other->GetActorLocation() - GetActorLocation();
+				const double Distance = LocationDifference.Length();
+
+				if (Distance < FlockingRadius)
+				{
+					Center += Other->GetActorLocation();
+					OthersInCohesion++;
+				}
 			}
 		}
 	}
-
+	
 	if (OthersInCohesion == 0)
 	{
 		return;
