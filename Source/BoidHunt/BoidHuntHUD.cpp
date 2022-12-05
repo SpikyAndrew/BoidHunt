@@ -42,6 +42,16 @@ void ABoidHuntHUD::ShowVictoryText()
 	UI->ShowVictoryText();
 }
 
+void ABoidHuntHUD::SetFuel(double JetpackFuel, double MaxJetpackFuel)
+{
+	UI->SetFuel(JetpackFuel, MaxJetpackFuel);
+}
+
+void ABoidHuntHUD::SetAmmo(int Ammo)
+{
+	UI->SetAmmo(Ammo);
+}
+
 
 void ABoidHuntHUD::SetBoids(int Number)
 {

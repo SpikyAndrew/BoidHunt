@@ -4,6 +4,7 @@
 #include "BoidHuntCharacter.h"
 
 #include "BoidHuntGameState.h"
+#include "BoidHuntHUD.h"
 #include "BoidHuntUI.h"
 #include "BoidManagerSubsystem.h"
 #include "Building.h"
@@ -25,6 +26,15 @@ ABoidHuntCharacter::ABoidHuntCharacter()
 void ABoidHuntCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	JetpackFuel = MaxJetpackFuel;
+	if (UWorld* World = GetWorld())
+	{
+		ABoidHuntHUD* HUD = Cast<ABoidHuntHUD>(World->GetFirstPlayerController()->GetHUD());
+		if (HUD)
+		{
+			HUD->SetAmmo(Ammo);
+		}
+	}
 }
 
 
@@ -32,6 +42,26 @@ void ABoidHuntCharacter::BeginPlay()
 void ABoidHuntCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	JetpackFuel += DeltaTime * JetpackFuelGainPerSecond;
+	
+	if (JetpackFuel > MaxJetpackFuel)
+	{
+		JetpackFuel = MaxJetpackFuel;
+	}
+	
+	if (UWorld* World = GetWorld())
+	{
+		ABoidHuntGameState* GameState = World->GetGameState<ABoidHuntGameState>();
+		if (GameState)
+		{
+			GameState->SetFuel(JetpackFuel, MaxJetpackFuel);
+		}
+	}
+	
+	if (IsJetpackLockedOut && JetpackFuel > JetpackFuelUnlockThreshold)
+	{
+		IsJetpackLockedOut = false;
+	}
 }
 
 void ABoidHuntCharacter::TryWallJump()
@@ -81,23 +111,51 @@ void ABoidHuntCharacter::OnMoveAction(const FInputActionValue& InputActionValue)
 
 FVector ABoidHuntCharacter::GetFiringLocation() const
 {
-	return GetActorLocation() + BaseEyeHeight * FVector::UpVector + 50 * GetBaseAimRotation().Vector();
+	return GetActorLocation() + BaseEyeHeight*FVector::UpVector;
 }
 
 void ABoidHuntCharacter::OnFireAction()
 {
-	if (BoidManager == nullptr)
+	if (Ammo < 1)
+		return;
+	Ammo--;
+
+	UWorld* World = GetWorld();
+	if (World && BoidManager == nullptr)
 	{
-		ABoidHuntGameState* GameState = static_cast<ABoidHuntGameState*>(GetWorld()->GetGameState());
+		ABoidHuntGameState* GameState = static_cast<ABoidHuntGameState*>(World->GetGameState());
 		if (GameState)
 			BoidManager = GameState->BoidManager;
+		ABoidHuntHUD* HUD = Cast<ABoidHuntHUD>(World->GetFirstPlayerController()->GetHUD());
+		if (HUD)
+		{
+			HUD->SetAmmo(Ammo);
+		}
+	}
+	if (World)
+	{
+		ABoidHuntHUD* HUD = Cast<ABoidHuntHUD>(World->GetFirstPlayerController()->GetHUD());
+		if (HUD)
+		{
+			HUD->SetAmmo(Ammo);
+		}
 	}
 	BoidManager->SpawnFalcon(GetFiringLocation(), GetBaseAimRotation().Vector());
 }
 
 void ABoidHuntCharacter::OnGlideAction()
 {
-	GetCharacterMovement()->AddImpulse(FVector::UpVector*3000);
+	if (IsJetpackLockedOut)
+		return;
+	
+	if (UWorld* World = GetWorld())
+	{
+		// Spend 1 Fuel per second plus cancel fuel gains from this tick.		
+		JetpackFuel -= World->GetDeltaSeconds() * (1+JetpackFuelGainPerSecond);
+		GetCharacterMovement()->AddImpulse(FVector::UpVector*JetpackForce);
+		if (JetpackFuel < 0)
+			IsJetpackLockedOut = true;
+	}
 }
 
 void ABoidHuntCharacter::OnLookAction(const FInputActionValue& InputActionValue)

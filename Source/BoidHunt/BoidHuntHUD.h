@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BoidHuntCharacter.h"
 #include "GameFramework/HUD.h"
 #include "BoidHuntUI.h"
 #include "BoidHuntHUD.generated.h"
@@ -19,6 +20,8 @@ public:
 	void SetBoids(int Number);
 	void SetFalcons(int Number);
 	void ShowVictoryText();
+	void SetFuel(double JetpackFuel, double MaxJetpackFuel);
+	void SetAmmo(int Ammo);
 
 protected:
 	virtual void BeginPlay() override;

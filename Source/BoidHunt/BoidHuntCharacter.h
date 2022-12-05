@@ -46,9 +46,24 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere)
-	float WallJumpImpulse;
+	double WallJumpImpulse;
+	UPROPERTY(EditAnywhere)
+    double MaxJetpackFuel;
+	UPROPERTY(EditAnywhere)
+    double JetpackFuelGainPerSecond;
+	UPROPERTY(EditAnywhere)
+	double JetpackFuelUnlockThreshold;
+	UPROPERTY(EditAnywhere)
+	double JetpackForce;
+	UPROPERTY(EditAnywhere)
+	int Ammo;
 	UPROPERTY(EditAnywhere)
 	// ReSharper disable once UnrealHeaderToolError
 	UInputMappingContext* InputMappingContext;
+	
 	ABoidManager* BoidManager = nullptr;
+	
+	double JetpackFuel;
+	bool IsJetpackLockedOut;
+
 };

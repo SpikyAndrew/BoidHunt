@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Boid.h"
+#include "BoidHuntCharacter.h"
 #include "GameFramework/GameStateBase.h"
 #include "BoidHuntGameState.generated.h"
 
@@ -20,6 +21,7 @@ public:
 	void AddFalcons(int Number);
 	int GetNumberOfBoids();
 	int GetNumberOfFalcons();
+	void SetFuel(double JetpackFuel, double MaxJetpackFuel);
 
 	UPROPERTY()
 	ABoidManager* BoidManager;
